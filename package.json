@@ -1,0 +1,27 @@
+{
+  "name": "mail-poller",
+  "version": "1.0.0",
+  "description": "Generic mail poller",
+  "main": "poller.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "mail",
+    "poller"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^2.6.1",
+    "colors": "^1.3.3",
+    "commander": "^2.19.0",
+    "email-addresses": "^3.0.3",
+    "imap-simple": "^4.2.0",
+    "mongodb-igniter": "^1.0.0",
+    "mongoose": "^5.4.4",
+    "properties-reader": "0.0.16",
+    "string-template": "^1.0.0",
+    "uuid": "^3.3.2"
+  }
+}
