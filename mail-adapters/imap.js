@@ -111,7 +111,7 @@ class Mailbox extends EventEmitter {
         var clientname = this.clientname
         var mailBackend = this.mailBackend
 
-        let box = this.options.box
+        let box = run.box() || this.options.box
 
         connection.openBox(box).then(function () {
 
@@ -131,7 +131,7 @@ class Mailbox extends EventEmitter {
 
             var task = (mail, next) => {
 
-                return next(null, function(callback) { new MailObject(clientname, mail).save(mailBackend, connection, callback) })
+                return next(null, function(callback) { new MailObject(clientname, mail).save(mailBackend, connection, run.info(), callback) })
             }
 
             /**

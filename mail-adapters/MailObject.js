@@ -165,7 +165,7 @@ class MailObject {
         }).catch(callback)
     }
 
-    save(mailBackend, connection, callback) {
+    save(mailBackend, connection, run_info, callback) {
 
         if (this.saved) return callback()
 
@@ -179,6 +179,8 @@ class MailObject {
                 // TODO: log here
                 return callback(err)
             }
+
+            mail.runInfo = run_info
 
             mailBackend.saveInfo(mail, (err, exists) => {
 

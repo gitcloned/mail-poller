@@ -3,9 +3,11 @@ const uuidv1 = require('uuid/v1')
 
 class Run {
 
-    constructor(pollerName, clientName, Model) {
+    constructor(pollerName, pollerConfig, clientName, Model) {
 
         this.pollerName = pollerName
+        this.pollerConfig = pollerConfig
+
         this.runId = uuidv1()
         this.clientName = clientName
 
@@ -86,6 +88,22 @@ class Run {
         this.model.save((err) => {
             console.log(err)
         })
+    }
+
+    info () {
+
+        return {
+
+            poller: this.pollerName,
+            clientname: this.clientName,
+            id: this.runId,
+            box: this.box()
+        }
+    }
+
+    box () {
+
+        return this.pollerConfig.box
     }
 }
 

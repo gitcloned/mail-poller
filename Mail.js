@@ -13,6 +13,7 @@ class Mail {
         this.attachments = []
         this.from = null
         this.to = null
+        this.runInfo = null
     }
 
     setHeader(headers) {

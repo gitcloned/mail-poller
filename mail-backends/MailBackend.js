@@ -77,9 +77,9 @@ class MailBackend {
         backend.saveBodyAndAttachments(messageId, mail, callback)
     }
 
-    run(pollerName) {
+    run(pollerName, pollerConfig) {
 
-        return this.mail_backend.run(pollerName)
+        return this.mail_backend.run(pollerName, pollerConfig)
     }
 }
 

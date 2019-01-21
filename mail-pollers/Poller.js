@@ -46,7 +46,7 @@ class Poller {
 
         that.interval = setInterval(() => {
 
-            var run = backend.run(pollerName)
+            var run = backend.run(pollerName, config)
 
             mailAdapter.poll(run, (err, results) => {
 

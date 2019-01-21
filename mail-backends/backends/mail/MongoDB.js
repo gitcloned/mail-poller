@@ -77,6 +77,7 @@ class MongoDB {
             mailDoc.headers = mail.headers
             mailDoc.attachments = mail.attachments
             mailDoc.body = mail.body
+            mailDoc.runInfo = mail.runInfo
 
             mailDoc.save((err) => {
                 callback(err, false)
@@ -97,9 +98,9 @@ class MongoDB {
         }
     }
 
-    run(pollerName) {
+    run(pollerName, pollerConfig) {
 
-        return new Run(pollerName, this.clientName, this.run_model)
+        return new Run(pollerName, pollerConfig, this.clientname, this.run_model)
     }
 }
 

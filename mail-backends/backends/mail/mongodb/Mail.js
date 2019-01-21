@@ -9,7 +9,8 @@ const mailSchema = new Schema({
     subject: String,
     body: Object,
     attachments: Array,
-    date: Date
+    date: Date,
+    runInfo: Object
 });
 
 module.exports.get = (mongoose) => {
