@@ -135,6 +135,7 @@ require('./logger/init').initialize(program.config.logging)(function () {
 
 var mailAdapter = null;
 var MailBackend = require('./mail-backends/MailBackend')
+var Poller = require('./mail-pollers/Poller')
 
 const mailBackend = new MailBackend(program.clientname, properties.path())
 
@@ -157,20 +158,36 @@ mailBackend.init((err) => {
         var modules = properties.path().modules
 
         const registered_modules = []
+        const pollers = {}
 
         for (var module in modules) {
             if (modules.hasOwnProperty(module) && modules[module] == 'true') {
 
                 try {
 
-                    var Module = require('./modules/' + module)
+                    var Module = require('./modules/Module')
 
                     /**
-                     * create module and set mail adapter
+                     * create mail poller
                      */
-                    registered_modules.push(new Module(properties.path()[module]).setPollerWithAdapter(mailAdapter))
+                    var pollerName = properties.path()[module].poller || "default"
+                    var poller = null
 
-                    console.log(fixColors(colors.green(" + [" + module + "]")))
+                    if (pollers[pollerName]) {
+                        poller = pollers[pollerName]
+                    } else {
+                        poller = new Poller(program.clientname, pollerName, mailAdapter, properties.path()["poller-" + pollerName], mailBackend)
+                    }
+
+                    poller.start((err) => {
+
+                        /**
+                         * create module and set mail adapter
+                         */
+                        registered_modules.push(new Module(module, properties.path()[module]).setPoller(poller))
+
+                        console.log(fixColors(colors.green(" + [" + module + "]")))
+                    })
                 } catch (e) {
 
                     console.log(e)

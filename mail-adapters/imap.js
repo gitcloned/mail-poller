@@ -92,10 +92,10 @@ class Mailbox extends EventEmitter {
         return JSON.parse('{"s":' + search_criteria + '}')
     }
 
-    poll(search_criteria, fetch_options, callback) {
+    poll(run, callback) {
 
-        search_criteria = this.parseSearchCriteria(search_criteria)
-        fetch_options = this.parseFetchOptions(fetch_options)
+        var search_criteria = run.search_criteria || {}
+        var fetch_options = run.fetch_options || {}
 
         // Fetch emails from the last 24h
         var delay = 1 * 24 * 3600 * 1000;
@@ -121,6 +121,10 @@ class Mailbox extends EventEmitter {
 
         }).then((mails) => {
 
+            run.fetched({
+                len: mails.length
+            })
+
             mails = [mails[0]]
 
             console.log(" - [%s] got %s mails", box, mails.length)
@@ -142,13 +146,20 @@ class Mailbox extends EventEmitter {
                             message: "Error in saving mail objects",
                             details: err
                         })
+
+                        run.failed(err, "saving")
+
                         return callback(err)
                     }
+
+                    run.saved()
 
                     callback(null, results)
                 })
             })
         }).catch((err) => {
+
+            run.failed(err, "fetching")
 
             callback(err)
         })

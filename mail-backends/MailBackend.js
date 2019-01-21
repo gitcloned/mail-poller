@@ -76,6 +76,11 @@ class MailBackend {
 
         backend.saveBodyAndAttachments(messageId, mail, callback)
     }
+
+    run(pollerName) {
+
+        return this.mail_backend.run(pollerName)
+    }
 }
 
 module.exports = MailBackend

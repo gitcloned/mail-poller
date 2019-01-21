@@ -2,6 +2,9 @@ const dbinit = require('mongodb-igniter')
 const format = require("string-template")
 const mongoose = require('mongoose')
 const mailModel = require('./mongodb/Mail')
+const runModel = require('./mongodb/Run')
+
+var Run = require('../../../mail-pollers/Run')
 
 class MongoDB {
 
@@ -15,6 +18,7 @@ class MongoDB {
         })
 
         this.model = null
+        this.run_model = null
     }
 
     init(callback) {
@@ -36,6 +40,7 @@ class MongoDB {
                     mongoose.connect(db)
 
                     that.model = mailModel.get(mongoose)
+                    that.run_model = runModel.get(mongoose)
 
                     console.log(' - initialization completed\n')
                     callback(null)
@@ -90,6 +95,11 @@ class MongoDB {
             "type": "mongodb",
             "db": this.db
         }
+    }
+
+    run(pollerName) {
+
+        return new Run(pollerName, this.clientName, this.run_model)
     }
 }
 
