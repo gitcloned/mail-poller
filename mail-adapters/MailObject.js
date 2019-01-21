@@ -2,7 +2,7 @@ const imaps = require('imap-simple')
 const uuidv1 = require('uuid/v1')
 const addrs = require("email-addresses")
 
-var Mail = require('../mail/Mail')
+var Mail = require('../Mail')
 
 const header_keys = ['content-type', 'mime-version', 'return-path', 'received', 'content-transfer-encoding']
 const address_keys = ['from', 'to']
@@ -60,7 +60,7 @@ class MailObject {
         return mailHeader
     }
 
-    parseBody(body) {
+    parseBody() {
 
         return {
             filename: 'mail-body.html',
@@ -137,6 +137,15 @@ class MailObject {
         var parts = imaps.getParts(this.message.attributes.struct)
         var message = this.message
 
+        var bodyItem = null
+        message.parts.forEach(function (item, index) {
+
+            if (item && item["which"].indexOf("TEXT") > -1) {
+
+                bodyItem = item
+            }
+        })
+
         var attachments = parts.filter(function (part) {
             return (part.type.indexOf('text') > -1 && part.subtype.indexOf('html') > -1 && !part.disposition) || (part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT')
         }).map(function (part) {
@@ -152,7 +161,7 @@ class MailObject {
 
         promise.then((attachments) => {
 
-            callback(null, attachments)
+            callback(null, attachments, bodyItem ? bodyItem.body : null)
         }).catch(callback)
     }
 
@@ -163,6 +172,8 @@ class MailObject {
         var that = this
 
         this.parse(connection, (err, mail) => {
+
+            var messageId = mail.messageId
 
             if (err) {
                 // TODO: log here
@@ -181,16 +192,18 @@ class MailObject {
                     return callback(null, false)
                 }
 
-                that.parseAttachments(connection, (err, attachments) => {
+                that.parseAttachments(connection, (err, attachments, body) => {
 
                     if (err) {
                         // TODO: log here
                         return callback(err)
                     }
 
-                    for (var i = 0; i < mail.attachments().length; i++) {
-                        mail.attachments()[i].data = attachments[i]
+                    for (var i = 0; i < mail.attachments.length; i++) {
+                        mail.attachments[i].data = attachments[i]
                     }
+
+                    mail.body.data = body
 
                     mailBackend.saveBodyAndAttachments(mail, (err) => {
 
@@ -199,7 +212,10 @@ class MailObject {
                             return callback(err)
                         }
 
-                        callback(null, mail.id)
+                        callback(null, messageId)
+
+                        // remove mail object for GC
+                        mail = null
                     })
                 })
             })

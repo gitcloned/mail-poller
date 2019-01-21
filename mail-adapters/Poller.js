@@ -31,10 +31,11 @@ class Poller {
 
         this.interval = setInterval(() => {
 
-            mailAdapter.poll(config.search_criteria, {}, (err, mails) => {
+            mailAdapter.poll(config.search_criteria, {}, (err, results) => {
 
-                console.log(err)
-                console.log(mails)
+                if (!err) {
+                    console.log(results)
+                }
             })
         }, config.frequency * 1000)
     }

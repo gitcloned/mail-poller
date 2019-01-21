@@ -74,7 +74,7 @@ class MailBackend {
 
         var backend = this.attachment_backend
 
-        backend.saveAttachments(messageId, mail, callback)
+        backend.saveBodyAndAttachments(messageId, mail, callback)
     }
 }
 

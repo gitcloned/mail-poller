@@ -73,7 +73,9 @@ class MongoDB {
             mailDoc.attachments = mail.attachments
             mailDoc.body = mail.body
 
-            mailDoc.save(callback)
+            mailDoc.save((err) => {
+                callback(err, false)
+            })
         })
     }
 

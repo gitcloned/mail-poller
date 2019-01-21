@@ -134,7 +134,7 @@ require('./logger/init').initialize(program.config.logging)(function () {
 });
 
 var mailAdapter = null;
-var MailBackend = require('./mail/MailBackend')
+var MailBackend = require('./mail-backends/MailBackend')
 
 const mailBackend = new MailBackend(program.clientname, properties.path())
 

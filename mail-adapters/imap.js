@@ -135,17 +135,17 @@ class Mailbox extends EventEmitter {
              */
             async.map(mails, task, (err, tasks) => {
 
-                async.parallelLimit(tasks, 10, (err) => {
+                async.parallelLimit(tasks, 10, (err, results) => {
 
                     if (err) {
                         console.log({
                             message: "Error in saving mail objects",
                             details: err
                         })
-                        return
+                        return callback(err)
                     }
 
-                    callback(null)
+                    callback(null, results)
                 })
             })
         }).catch((err) => {
