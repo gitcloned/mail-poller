@@ -19,7 +19,7 @@ const runSchema = new Schema({
     failed_at: String,
     failure_reason: String,
 
-    mails_length: Number,
+    fetched: Object,
 
     modules: Array,
     clientname: String

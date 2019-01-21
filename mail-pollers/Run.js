@@ -40,6 +40,7 @@ class Run {
 
         var fetched_at = new Date()
 
+        this.model.fetched = options
         this.model.fetched_at = fetched_at
     }
 
