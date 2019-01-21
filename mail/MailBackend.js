@@ -3,6 +3,7 @@ class MailBackend {
 
     constructor(clientname, config) {
 
+        this.clientname = clientname
         this.mail_backend = null
         this.attachment_backend = null
 
@@ -35,26 +36,45 @@ class MailBackend {
         this.mail_backend.init(callback)
     }
 
-    save(mail, callback) {
+    saveInfo(mail, callback) {
 
-        var id = mail.id
+        var messageId = mail.messageId
 
-        var attachment_backend = this.attachment_backend
-        var mail_backend = this.mail_backend
+        var clientname = this.clientname
+        var backend = this.mail_backend
 
-        this.mail_backend.saveMail(id, mail, (err, exists) => {
+        var date = mail.date
+
+        var info = {
+            year: date.getFullYear(),
+            month: date.getMonth(),
+            day: date.getDay(),
+            messageId: messageId,
+            clientname: clientname
+        }
+
+        mail.body.storage = this.attachment_backend.info(info, mail.body)
+
+        for (var i=0; i<mail.attachments.length; i++) 
+            mail.attachments[i].storage = this.attachment_backend.info(info, mail.attachments[i])
+
+        backend.saveMail(messageId, mail, (err, exists) => {
 
             if (err) {
                 return callback(err)
             }
 
-            if (exists)
-                return callback(null, exists)
-
-            attachment_backend.saveMail(id, mail, (err, info) => {
-                
-            })
+            callback(null, exists)
         })
+    }
+
+    saveBodyAndAttachments(mail, callback) {
+
+        var messageId = mail.messageId
+
+        var backend = this.attachment_backend
+
+        backend.saveAttachments(messageId, mail, callback)
     }
 }
 

@@ -64,28 +64,30 @@ class MongoDB {
             var mailDoc = new Model()
 
             mailDoc.messageId = id
-            mailDoc.from = mail.from()
-            mailDoc.to = mail.to()
-            mailDoc.subject = mail.subject()
-            mailDoc.date = new Date(mail.date())
 
-            var headers = mail.headers()
-
-            mailDoc.header = {
-                'content-type': headers['content-type'],
-                'mime-version': headers['mime-version'],
-                'return-path': headers['return-path'],
-                'received': headers['received'],
-                'content-transfer-encoding': headers['content-transfer-encoding']
-            }
+            mailDoc.from = mail.from
+            mailDoc.to = mail.to
+            mailDoc.subject = mail.subject
+            mailDoc.date = new Date(mail.date)
+            mailDoc.headers = mail.headers
+            mailDoc.attachments = mail.attachments
+            mailDoc.body = mail.body
 
             mailDoc.save(callback)
         })
     }
 
-    saveAttachments(id, attachments, callback) {
+    saveBodyAndAttachments(id, mail, callback) {
 
         callback("MongoDB does not support saving attachment")
+    }
+
+    info (messageId, date, object) {
+
+        return {
+            "type": "mongodb",
+            "db": this.db
+        }
     }
 }
 

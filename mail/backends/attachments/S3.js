@@ -1,5 +1,4 @@
 const format = require("string-template")
-var s3 = require('s3')
 
 class S3 {
 
@@ -8,14 +7,15 @@ class S3 {
         this.clientname = clientname
         this.config = config
 
-        this.bucket = format(this.config.db, {
+        this.bucket = format(this.config.bucket, {
             clientname: clientname.replace(/\s+/g, '')
         })
+        this.folder = this.config.folder
     }
 
     init(callback) {
 
-        
+
     }
 
     saveMail(id, mail, callback) {
@@ -23,9 +23,20 @@ class S3 {
         callback("S3 does not support saving mail info")
     }
 
-    saveAttachments(id, attachments, callback) {
+    saveBodyAndAttachments(id, mail, callback) {
 
-        
+        var attachments = mail.attachments()
+
+        callback(null)
+    }
+
+    info(info, object) {
+
+        return {
+            "type": "s3",
+            "bucket": this.bucket,
+            "folder": format(this.folder, info)
+        }
     }
 }
 

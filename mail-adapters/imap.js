@@ -2,7 +2,7 @@ var imaps = require('imap-simple')
 const async = require('async')
 var EventEmitter = require('events').EventEmitter;
 
-var MailObject = require('../mail/MailObject')
+var MailObject = require('./MailObject')
 
 class Mailbox extends EventEmitter {
 
@@ -111,7 +111,9 @@ class Mailbox extends EventEmitter {
         var clientname = this.clientname
         var mailBackend = this.mailBackend
 
-        connection.openBox(this.options.box).then(function () {
+        let box = this.options.box
+
+        connection.openBox(box).then(function () {
 
             console.log(search_criteria, fetch_options)
 
@@ -121,7 +123,7 @@ class Mailbox extends EventEmitter {
 
             mails = [mails[0]]
 
-            console.log(" - got %s mails", mails.length)
+            console.log(" - [%s] got %s mails", box, mails.length)
 
             var task = (mail, next) => {
 

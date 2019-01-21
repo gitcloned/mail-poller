@@ -3,10 +3,12 @@ const Schema = mongoose.Schema;
 
 const mailSchema = new Schema({
     messageId: String,
-    header: Object,
+    headers: Object,
     from: Array,
     to: Array,
     subject: String,
+    body: Object,
+    attachments: Array,
     date: Date
 });
 

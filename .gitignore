@@ -80,3 +80,5 @@ typings/
 .dynamodb/
 
 archive/
+
+mail-setup/
