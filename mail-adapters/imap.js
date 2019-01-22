@@ -94,18 +94,17 @@ class Mailbox extends EventEmitter {
 
     poll(run, callback) {
 
-        var search_criteria = run.search_criteria || {}
-        var fetch_options = run.fetch_options || {}
+        var search_criteria = run.searchCriteria()
+        var fetch_options = run.fetchOptions()
 
         // Fetch emails from the last 24h
-        var delay = 1 * 24 * 3600 * 1000;
-        var yesterday = new Date();
-        yesterday.setTime(Date.now() - delay);
-        yesterday = yesterday.toISOString();
-        search_criteria = [['SINCE', yesterday]];
-
-        //fetch_options = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], struct: true }
-        fetch_options = { bodies: ['HEADER', 'TEXT'], struct: true }
+        // var delay = 1 * 24 * 3600 * 1000;
+        // var yesterday = new Date();
+        // yesterday.setTime(Date.now() - delay);
+        // yesterday = yesterday.toISOString();
+        // search_criteria = [['SINCE', yesterday]];
+        // fetch_options = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], struct: true }
+        // fetch_options = { bodies: ['HEADER', 'TEXT'], struct: true }
 
         var connection = this.connection
         var clientname = this.clientname
@@ -125,7 +124,7 @@ class Mailbox extends EventEmitter {
                 len: mails.length
             })
 
-            mails = [mails[0]]
+            // mails = [mails[0]]
 
             console.log(" - [%s] got %s mails", box, mails.length)
 

@@ -19,6 +19,7 @@
     "commander": "^2.19.0",
     "email-addresses": "^3.0.3",
     "imap-simple": "^4.2.0",
+    "moment": "^2.24.0",
     "mongodb-igniter": "^1.0.0",
     "mongoose": "^5.4.4",
     "properties-reader": "0.0.16",
