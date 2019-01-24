@@ -1,9 +1,13 @@
 const mongoose = require('mongoose')
 const moment = require('moment')
 
-class Poller {
+var EventEmitter = require('events').EventEmitter
+
+class Poller extends EventEmitter {
 
     constructor(clientname, name, mailAdapter, pollerConfig, mailBackend) {
+
+        super()
 
         this.name = name
         this.clientname = clientname
@@ -19,8 +23,6 @@ class Poller {
 
         // fetch options
         this.fetch_options = JSON.parse(this.pollerConfig.fetch_options || '{ "bodies": ["HEADER", "TEXT"], "struct": true }')
-
-        this.modules = []
 
         this.backend = mailBackend
         this.interval = null
@@ -90,27 +92,38 @@ class Poller {
 
             mailAdapter.poll(run, (err, results) => {
 
-                if (!err) {
+                var errors = []
+                var saved_mails = []
+                var existing_mails = []
 
-                    console.log(results)
+                for (var i=0; i<results.length; i++) {
 
-                    run.emitted({
-                        modules: that.modules
-                    })
+                    if (results[i].value) {
+                        if (results[i].value[1] === true) {
+                            existing_mails.push(results[i].value[0])
+                        } else {
+                            saved_mails.push(results[i].value[0])
+                        }
+                    } else
+                        errors.push(results[i].error)
+                }
+
+                if (saved_mails.length + existing_mails.length > 0) {
+
+                    that.emit('mails', saved_mails, existing_mails)
+
+                    run.emitted()
                 }
 
                 // save run
-                run.save()
+                run.save(errors, saved_mails, existing_mails)
 
                 // set the last seen as the current run created_at
                 that.last_seen = run.created_at
             })
         }, config.frequency * 1000)
-    }
 
-    registerModule(module) {
-
-        this.modules.push(module.name)
+        callback(null)
     }
 
     lastSeen() {

@@ -11,15 +11,21 @@ const runSchema = new Schema({
     saved_at:Date,
     emitted_at:Date,
 
+    fetched_cnt: Number,
+    saved_cnt: Number,
+
+    saved_ids: Array,
+    existing_ids: Array,
+
+    total_time: Number,
+    fetch_time: Number,
+
     failed: {
         type: Boolean,
         default: false
     },
 
-    failed_at: String,
-    failure_reason: String,
-
-    fetched: Object,
+    failures: Array,
 
     modules: Array,
     clientname: String

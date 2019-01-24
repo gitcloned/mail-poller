@@ -33,7 +33,7 @@ class S3 {
 
     saveBodyAndAttachments(id, mail, callback) {
 
-        console.log("saving mail body and attachments")
+        // console.log("saving mail body and attachments")
 
         var attachments = mail.attachments
 

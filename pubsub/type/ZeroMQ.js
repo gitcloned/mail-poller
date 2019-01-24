@@ -1,7 +1,6 @@
-
 var zmq = require('zeromq')
 
-var State = require('../enums').NodeState;
+var State = require('../enums/NodeState').NodeState;
 
 class ZeroMQ {
 

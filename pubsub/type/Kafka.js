@@ -3,7 +3,7 @@ var kafka = require('kafka-node');
 var Client = kafka.Client;
 var Producer = kafka.Producer;
 
-var State = require('../enums').NodeState;
+var State = require('../enums/NodeState').NodeState;
 
 class Kafka {
 

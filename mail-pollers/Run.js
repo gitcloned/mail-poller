@@ -20,6 +20,8 @@ class Run {
         this.search_criteria = null
 
         this.fetch_options = null
+
+        this.failures = []
     }
 
     /**
@@ -42,19 +44,21 @@ class Run {
      * Mark run as fetched
      * @param {object} options 
      */
-    fetched(options) {
+    fetched(len) {
 
         var fetched_at = moment.utc().toDate()
 
-        this.model.fetched = options
+        this.model.fetched_cnt = len
         this.model.fetched_at = fetched_at
+
+        this.model.fetch_time = fetched_at - this.created_at
     }
 
     /**
      * Mark run as saved
      * @param {object} options 
      */
-    saved(options) {
+    saved(mails) {
 
         var saved_at = moment.utc().toDate()
 
@@ -82,12 +86,26 @@ class Run {
         var completed_at = moment.utc().toDate()
 
         this.model.completed_at = completed_at
-        this.model.failed_at = state
         this.model.failed = true
-        this.model.failure_reason = err.toString()
+
+        this.failures.push({
+            at: state,
+            err: err
+        })
     }
 
-    save() {
+    save(errors, saved_mails, existing_mails) {
+
+        // console.log([errors, saved_mails, existing_mails])
+
+        this.model.saved_cnt = saved_mails.length
+        this.model.saved_ids = saved_mails
+
+        this.model.existing_ids = existing_mails
+
+        this.model.total_time = new Date() - this.created_at
+
+        this.model.failures = this.failures.concat(errors)
 
         this.model.save((err) => {
             console.log(err)

@@ -155,9 +155,9 @@ mailBackend.init((err) => {
 
     mailAdapter.connect().on('connect', () => {
 
-        console.log('registering modules\n')
-
         var modules = properties.path().modules
+
+        console.log('registering modules\n')
 
         const registered_modules = []
         const pollers = {}
@@ -186,7 +186,7 @@ mailBackend.init((err) => {
                         /**
                          * create module and set mail adapter
                          */
-                        registered_modules.push(new Module(module, properties.path()[module], publisher).setPoller(poller))
+                        registered_modules.push(new Module(module, program.clientname, properties.path()[module], publisher).setPoller(poller))
 
                         console.log(fixColors(colors.green(" + [" + module + "]")))
                     })

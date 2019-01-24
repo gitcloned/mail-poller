@@ -28,6 +28,13 @@ const parseEmailAddress = (addresses) => {
     return addresses
 }
 
+const parseError = (err) => {
+    return {
+        msg: err.toString(),
+        stack: err.stack
+    }
+}
+
 class MailObject {
 
     constructor(clientname, message) {
@@ -60,6 +67,17 @@ class MailObject {
         return mailHeader
     }
 
+    parseAttachmentHeader(headers) {
+
+        var mailHeader = {}
+
+        for (var i = 0; i < header_keys.length; i++) {
+            mailHeader[header_keys[i]] = headers[header_keys[i]]
+        }
+
+        return mailHeader
+    }
+
     parseBody() {
 
         return {
@@ -75,58 +93,67 @@ class MailObject {
 
         if (this.parsed) return callback()
 
-        let headerIndex = 0
-        var headerItem = null
-        var bodyItem = null
+        var mail = null
 
-        var message = this.message
+        try {
 
-        message.parts.forEach(function (item, index) {
+            let headerIndex = 0
+            var headerItem = null
+            var bodyItem = null
 
-            if (item && item["which"].indexOf("HEADER") > -1) {
+            var message = this.message
 
-                headerIndex = index
-                headerItem = item
-            } else if (item && item["which"].indexOf("TEXT") > -1) {
+            message.parts.forEach(function (item, index) {
 
-                bodyItem = item
-            }
-        })
+                if (item && item["which"].indexOf("HEADER") > -1) {
 
-        var mail = new Mail(this.clientname, headerItem.body['message-id'] || uuidv1())
+                    headerIndex = index
+                    headerItem = item
+                } else if (item && item["which"].indexOf("TEXT") > -1) {
 
-        mail.setHeader(this.parseHeader(headerItem.body, mail))
-            .setBody(this.parseBody(bodyItem.body))
+                    bodyItem = item
+                }
+            })
 
-        /**
-         * parse attachments
-         */
-        var parts = imaps.getParts(this.message.attributes.struct)
+            mail = new Mail(this.clientname, headerItem.body['message-id'] || uuidv1())
 
-        var attachments = parts.filter(function (part) {
-            return (part.type.indexOf('text') > -1 && part.subtype.indexOf('html') > -1 && !part.disposition) || (part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT')
-        }).map(function (part) {
+            mail.setHeader(this.parseHeader(headerItem.body, mail))
+                .setBody(this.parseBody(bodyItem.body))
 
-            var isAttachment = false
+            /**
+             * parse attachments
+             */
+            var parts = imaps.getParts(this.message.attributes.struct)
 
-            if (part.disposition && part.disposition.type && part.disposition.type.toUpperCase() === "ATTACHMENT")
-                isAttachment = true
+            var that = this
 
-            return {
-                filename: (part.disposition && part.disposition.params.filename) ? part.disposition.params.filename : (isAttachment ? 'bodyAttach' : 'mail-body') + '.html',
-                header: message["parts"][headerIndex]["body"],
-                attachmentId: message["attributes"]["uid"],
-                date: message["attributes"].date,
-                // specify where the attachment is stored
-                storage: null,
-                // contains raw data
-                data: null
-            }
-        })
+            var attachments = parts.filter(function (part) {
+                return (part.type.indexOf('text') > -1 && part.subtype.indexOf('html') > -1 && !part.disposition) || (part.disposition && part.disposition.type.toUpperCase() === 'ATTACHMENT')
+            }).map(function (part) {
 
-        mail.setAttachments(attachments)
+                var isAttachment = false
 
-        return callback(null, mail);
+                if (part.disposition && part.disposition.type && part.disposition.type.toUpperCase() === "ATTACHMENT")
+                    isAttachment = true
+
+                return {
+                    filename: (part.disposition && part.disposition.params.filename) ? part.disposition.params.filename : (isAttachment ? 'bodyAttach' : 'mail-body') + '.html',
+                    header: that.parseAttachmentHeader(message["parts"][headerIndex]["body"]),
+                    attachmentId: message["attributes"]["uid"],
+                    date: message["attributes"].date,
+                    // specify where the attachment is stored
+                    storage: null,
+                    // contains raw data
+                    data: null
+                }
+            })
+
+            mail.setAttachments(attachments)
+        }catch(err) {
+            return callback(err, mail)
+        }
+
+        if (mail) callback(null, mail)
     }
 
     parseAttachments(connection, callback) {
@@ -152,7 +179,6 @@ class MailObject {
 
             return connection.getPartData(message, part)
                 .then(function (partData) {
-
                     return partData
                 });
         })
@@ -160,7 +186,6 @@ class MailObject {
         var promise = Promise.all(attachments)
 
         promise.then((attachments) => {
-
             callback(null, attachments, bodyItem ? bodyItem.body : null)
         }).catch(callback)
     }
@@ -173,12 +198,13 @@ class MailObject {
 
         this.parse(connection, (err, mail) => {
 
-            var messageId = mail.messageId
+            if (err) return callback({
+                mail: mail ? mail.messageId : null,
+                err: parseError(err),
+                at: "parsing"
+            })
 
-            if (err) {
-                // TODO: log here
-                return callback(err)
-            }
+            var messageId = mail.messageId[0]
 
             mail.runInfo = run_info
 
@@ -186,7 +212,11 @@ class MailObject {
 
                 if (err) {
                     // TODO: log here
-                    return callback(err)
+                    return callback({
+                        mail: mail.messageId,
+                        err: parseError(err),
+                        at: "saving"
+                    })
                 }
 
                 if (exists) {
@@ -198,7 +228,11 @@ class MailObject {
 
                     if (err) {
                         // TODO: log here
-                        return callback(err)
+                        return callback({
+                            mail: mail.messageId,
+                            err: parseError(err),
+                            at: "parsing-attachments"
+                        })
                     }
 
                     for (var i = 0; i < mail.attachments.length; i++) {
@@ -211,10 +245,14 @@ class MailObject {
 
                         if (err) {
                             // TODO: log here
-                            return callback(err)
+                            return callback({
+                                mail: mail.messageId,
+                                err: parseError(err),
+                                at: "saving-attachments"
+                            })
                         }
 
-                        callback(null, [messageId, false])
+                        callback(null, [messageId, false, true])
 
                         // remove mail object for GC
                         mail = null

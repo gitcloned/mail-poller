@@ -10,17 +10,17 @@ class Publisher {
 
             case 'kafka':
                 var Agent = require('./type/Kafka')
-                this.agent = new Agent(clientname, config)
+                this.agent = new Agent(clientname, "kafka", config)
                 break
 
             case 'redis':
                 var Agent = require('./type/Redis')
-                this.agent = new Agent(clientname, config)
+                this.agent = new Agent(clientname, "redis", config)
                 break
 
             case 'zeromq':
                 var Agent = require('./type/ZeroMQ')
-                this.agent = new Agent(clientname, config)
+                this.agent = new Agent(clientname, "zeromq", config)
                 break
         }
     }

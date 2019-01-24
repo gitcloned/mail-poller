@@ -120,17 +120,13 @@ class Mailbox extends EventEmitter {
 
         }).then((mails) => {
 
-            run.fetched({
-                len: mails.length
-            })
-
-            // mails = [mails[0]]
+            run.fetched(mails.length)
 
             console.log(" - [%s] got %s mails", box, mails.length)
 
             var task = (mail, next) => {
 
-                return next(null, function(callback) { new MailObject(clientname, mail).save(mailBackend, connection, run.info(), callback) })
+                return next(null, async.reflect(function(callback) { new MailObject(clientname, mail).save(mailBackend, connection, run.info(), callback) }))
             }
 
             /**
@@ -141,26 +137,22 @@ class Mailbox extends EventEmitter {
                 async.parallelLimit(tasks, 10, (err, results) => {
 
                     if (err) {
-                        console.log({
-                            message: "Error in saving mail objects",
-                            details: err
+
+                        return callback({
+                            at: "saving",
+                            err: err
                         })
-
-                        run.failed(err, "saving")
-
-                        return callback(err)
                     }
-
-                    run.saved()
 
                     callback(null, results)
                 })
             })
         }).catch((err) => {
 
-            run.failed(err, "fetching")
-
-            callback(err)
+            callback({
+                at: "fetching",
+                err: err
+            })
         })
     }
 }
