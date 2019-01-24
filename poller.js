@@ -136,8 +136,10 @@ require('./logger/init').initialize(program.config.logging)(function () {
 var mailAdapter = null;
 var MailBackend = require('./mail-backends/MailBackend')
 var Poller = require('./mail-pollers/Poller')
+var Publisher = require('./pubsub/Publisher')
 
 const mailBackend = new MailBackend(program.clientname, properties.path())
+const publisher = new Publisher(program.clientname, properties.path().pubsub)
 
 switch (properties.path().mail.type) {
 
@@ -184,7 +186,7 @@ mailBackend.init((err) => {
                         /**
                          * create module and set mail adapter
                          */
-                        registered_modules.push(new Module(module, properties.path()[module]).setPoller(poller))
+                        registered_modules.push(new Module(module, properties.path()[module], publisher).setPoller(poller))
 
                         console.log(fixColors(colors.green(" + [" + module + "]")))
                     })
