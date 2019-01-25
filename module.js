@@ -90,19 +90,13 @@ program
     .version('1.0.0')
     .option('-c, --clientname <string>', 'clientname')
     .option('--config <file>', 'config file (property)', isValidConfigFile)
-    .option('-l, --lookback [number]', 'lookback period in seconds', parseInt, 60)
-    .option('-f, --fetch <items>', 'fields to fetch HEADER(FROM,TO..) TEXT', collect, "HEADER,TEXT".split(","))
-    .option('--limit <n>', 'Limit of mails to process after fetch', parseInt, -1)
-    .option('--unseen', 'Only unseen mails')
-    .option('--mark-seen', 'Marked fetched mails as seen', parseBoolean, false)
-    .option('-b, --box', 'Box name (INBOX, SENT ..)', 'INBOX')
-    .option('-s, --search', 'Search criteria', '[]')
-    .option('--watch', 'Run in watch mode', false)
-    .option('-t, --test', 'Test mail connectivity')
+    .option('-m, --module <string>', 'module')
 
     .parse(process.argv);
 
 if (!program.clientname) return help("Do specify a valid clientname")
+
+if (!program.module) return help("Do specify a valid module name")
 
 if (!program.config) return help("Do specify a valid mail config")
 
@@ -133,13 +127,11 @@ require('./logger/init').initialize(program.config.logging)(function () {
     console.log(fixColors(colors.gray("Logger started\n")))
 });
 
-var mailAdapter = null;
 var MailBackend = require('./mail-backends/MailBackend')
-var Poller = require('./mail-pollers/Poller')
-var Publisher = require('./pubsub/Publisher')
+var Subscriber = require('./pubsub/Subscriber')
 
 const mailBackend = new MailBackend(program.clientname, properties.path())
-const publisher = new Publisher(program.clientname, properties.path().pubsub)
+const subscriber = new Subscriber(program.clientname, properties.path().pubsub)
 
 switch (properties.path().mail.type) {
 
@@ -151,53 +143,12 @@ switch (properties.path().mail.type) {
 
 mailBackend.init((err) => {
 
-    if (err) return
+    if (err) return console.log(err)
 
-    mailAdapter.connect().on('connect', () => {
+    console.log(fixColors(colors.green(" + [" + program.module + "]")))
+    console.log(properties.path()[program.module])
 
-        var modules = properties.path().modules
+    var Module = require('./modules/Module')
 
-        console.log('registering modules\n')
-
-        const registered_modules = []
-        const pollers = {}
-
-        for (var module in modules) {
-            if (modules.hasOwnProperty(module) && modules[module] == 'true') {
-
-                try {
-
-                    var Module = require('./modules/Module')
-
-                    /**
-                     * create mail poller
-                     */
-                    var pollerName = properties.path()[module].poller || "default"
-                    var poller = null
-
-                    if (pollers[pollerName]) {
-                        poller = pollers[pollerName]
-                    } else {
-                        poller = new Poller(program.clientname, pollerName, mailAdapter, properties.path()["poller-" + pollerName], mailBackend)
-                    }
-
-                    poller.start((err) => {
-
-                        /**
-                         * create module and set mail adapter
-                         */
-                        registered_modules.push(new Module(module, program.clientname, properties.path()[module]).setPublisher(publisher).setPoller(poller))
-
-                        console.log(fixColors(colors.green(" + [" + module + "]")))
-                    })
-                } catch (e) {
-
-                    console.log(e)
-                    console.log(fixColors(colors.bgRed("Unknown module specified '" + module + "'")))
-                }
-            }
-        }
-
-        console.log("")
-    })
+    var module = new Module(program.module, program.clientname, properties.path()[program.module]).setSubscriber(subscriber)
 })

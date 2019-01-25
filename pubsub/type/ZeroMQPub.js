@@ -15,7 +15,7 @@ class ZeroMQ {
         /**
          * zeromq producer
         */
-        this.producer = zmq.socket('push')
+        this.producer = zmq.socket('pub')
 
         /**
          * subscriber state
@@ -37,9 +37,19 @@ class ZeroMQ {
 
         if (this.state === State.INITIALIZED) return callback(null, true)
 
+        console.log(" [zeromq] connecting (pub) at %s", this.config.address)
+
+        this.producer.monitor(1000, 0)
         this.producer.bindSync(this.config.address)
 
-        this.state = State.INITIALIZED
+        var that = this
+
+        this.producer.on('listen', () => {
+
+            that.state = State.INITIALIZED
+
+            callback(null)
+        })
     }
 
     disconnect() {
@@ -78,15 +88,15 @@ class ZeroMQ {
 
             var producer = that.producer;
 
-            var payload = [topic, message]
+            var payload = [topic, JSON.stringify(message)]
 
             if (!payload.length) return callback("Invalid payload, not an array or no item to publish");
 
-            console.log("  - payload: %j", payload)
+            // console.log(" \n[zeromq] (%s) sending: %j", that.config.address, payload)
 
-            producer.send(payload)
+            producer.send(payload, null, callback)
 
-            callback(null, true)
+            // callback(null, true)
         });
     }
 };

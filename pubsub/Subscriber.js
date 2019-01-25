@@ -1,4 +1,4 @@
-class Publisher {
+class Subscriber {
 
     constructor(clientname, config) {
 
@@ -9,26 +9,26 @@ class Publisher {
         switch (config.type) {
 
             case 'kafka':
-                var Agent = require('./type/KafkaPub')
+                var Agent = require('./type/KafkaSub')
                 this.agent = new Agent(clientname, "kafka", config)
                 break
 
             case 'redis':
-                var Agent = require('./type/RedisPub')
+                var Agent = require('./type/RedisSub')
                 this.agent = new Agent(clientname, "redis", config)
                 break
 
             case 'zeromq':
-                var Agent = require('./type/ZeroMQPub')
+                var Agent = require('./type/ZeroMQSub')
                 this.agent = new Agent(clientname, "zeromq", config)
                 break
         }
     }
 
-    publish(topic, message, callback) {
+    subscribe(topic, callback) {
 
-        this.agent.publish(topic, message, callback)
+        this.agent.subscribe(topic, callback)
     }
 }
 
-module.exports = Publisher
+module.exports = Subscriber
