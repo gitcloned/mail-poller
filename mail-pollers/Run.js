@@ -141,7 +141,9 @@ class Run {
 
             return [
                 ["SENTSINCE", lastSeen.toISOString()],
-                ["SENTBEFORE", this.created_at.toISOString()]
+                // ["SENTBEFORE", this.created_at.toISOString()]
+                //["SINCE", lastSeen.toISOString()],
+                //["BEFORE", this.created_at.toISOString()]
             ]
         } else return [type, date]
     }

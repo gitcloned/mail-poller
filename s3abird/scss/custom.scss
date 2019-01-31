@@ -1,0 +1,15 @@
+@import "../node_modules/bootstrap/scss/bootstrap";
+
+@import url('https://fonts.googleapis.com/css?family=Ubuntu');
+
+// light-blue 200
+$bg-color: #81D4FA;
+
+html, body {
+    height: 100%;
+    background-color: $bg-color;
+}
+
+.navbar-brand {
+    font-family: 'Ubuntu', sans-serif;
+}

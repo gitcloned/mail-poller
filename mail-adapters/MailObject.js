@@ -4,7 +4,8 @@ const addrs = require("email-addresses")
 
 var Mail = require('../Mail')
 
-const header_keys = ['content-type', 'mime-version', 'return-path', 'received', 'content-transfer-encoding']
+const header_keys = ['content-type', 'mime-version', 'return-path', 'received', 'content-transfer-encoding', 'in-reply-to', 'references']
+const attachment_header_keys = ['content-type', 'mime-version', 'content-transfer-encoding']
 const address_keys = ['from', 'to']
 const date_keys = ['date']
 
@@ -71,8 +72,8 @@ class MailObject {
 
         var mailHeader = {}
 
-        for (var i = 0; i < header_keys.length; i++) {
-            mailHeader[header_keys[i]] = headers[header_keys[i]]
+        for (var i = 0; i < attachment_header_keys.length; i++) {
+            mailHeader[attachment_header_keys[i]] = headers[attachment_header_keys[i]]
         }
 
         return mailHeader
@@ -116,6 +117,8 @@ class MailObject {
             })
 
             mail = new Mail(this.clientname, headerItem.body['message-id'] || uuidv1())
+
+            // console.log(Object.keys(headerItem.body))
 
             mail.setHeader(this.parseHeader(headerItem.body, mail))
                 .setBody(this.parseBody(bodyItem.body))
