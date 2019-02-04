@@ -1,4 +1,3 @@
-
 class MailBackend {
 
     constructor(clientname, config) {
@@ -20,6 +19,10 @@ class MailBackend {
                 var MongoDB = require('./backends/mail/MongoDB')
                 this.mail_backend = new MongoDB(clientname, config.mongodb)
                 break
+            default:
+                var NoBackend = require('./backends/mail/NoBackend')
+                this.mail_backend = new NoBackend(clientname, {})
+                break
         }
 
         switch (config.backend.attachments) {
@@ -28,10 +31,14 @@ class MailBackend {
                 var S3 = require('./backends/attachments/S3')
                 this.attachment_backend = new S3(clientname, config.s3)
                 break
+            default:
+                var NoBackend = require('./backends/attachments/NoBackend')
+                this.attachment_backend = new NoBackend(clientname, {})
+                break
         }
     }
 
-    init (callback) {
+    init(callback) {
 
         this.mail_backend.init(callback)
     }
@@ -55,7 +62,7 @@ class MailBackend {
 
         mail.body.storage = this.attachment_backend.info(info, mail.body)
 
-        for (var i=0; i<mail.attachments.length; i++) 
+        for (var i = 0; i < mail.attachments.length; i++)
             mail.attachments[i].storage = this.attachment_backend.info(info, mail.attachments[i])
 
         backend.saveMail(messageId, mail, (err, exists) => {
