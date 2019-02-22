@@ -11,6 +11,8 @@ class Run {
         this.runId = uuidv1()
         this.clientName = clientName
 
+        console.log("creating run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
+
         this.model = new Model()
 
         this.created_at = moment.utc().toDate()
