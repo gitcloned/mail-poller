@@ -51,12 +51,12 @@ class Module {
                 }
 
                 console.log(' [%s] got message of client {%s}', name, message.clientname)
-		console.log(message.toString())
+                console.log(message.toString())
 
-		try {
-		    message = JSON.parse(message)
-                } catch(err) {
-                   return  console.log("error occurred while parsing message over topic, err: %s", err.toString())
+                try {
+                    message = JSON.parse(message)
+                } catch (err) {
+                    return console.log("error occurred while parsing message over topic, err: %s", err.toString())
                 }
 
                 console.log(message.mails.toString())

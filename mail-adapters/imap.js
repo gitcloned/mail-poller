@@ -120,7 +120,7 @@ class Mailbox extends EventEmitter {
 
             run.fetched(mails.length)
 
-            console.log(" - [%s] got %s mails", box, mails.length)
+            console.log(" - [%s] got %s mails {%s}", box, mails.length, run.runId)
 
             var task = (mail, next) => {
 
