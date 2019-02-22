@@ -97,7 +97,7 @@ var isValidHandler = function (val) {
         return false
     }
 
-    if (typeof handler.handler !== "function") {
+    if (typeof handler.handle !== "function") {
         console.log("\n" + fixColors(colors.grey("handle method not implemented. Not a valid handler file: " + val)) + "\n\n")
 
         console.log("/* called as mails are fetched, passed array of Mail object */\nmodule.exports.handle = function (mails) {\n    // write your code here \n}")
