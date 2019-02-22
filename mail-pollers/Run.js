@@ -22,6 +22,8 @@ class Run {
         this.fetch_options = null
 
         this.failures = []
+
+        this.completed = false
     }
 
     /**
@@ -34,6 +36,7 @@ class Run {
         this.model.name = this.pollerName
         this.model.clientName = this.clientName
         this.model.created_at = this.created_at
+        this.model.state = "Running"
 
         this.model.save((err) => {
             console.log(err)
@@ -74,6 +77,9 @@ class Run {
         var completed_at = moment.utc().toDate()
 
         this.model.completed_at = completed_at
+        this.model.state = "Completed"
+
+        this.complete()
     }
 
     /**
@@ -87,6 +93,7 @@ class Run {
 
         this.model.completed_at = completed_at
         this.model.failed = true
+        this.model.state = "Errored"
 
         this.failures.push({
             at: state,
@@ -146,6 +153,16 @@ class Run {
                 //["BEFORE", this.created_at.toISOString()]
             ]
         } else return [type, date]
+    }
+
+    complete () {
+
+        this.completed = true
+    }
+
+    isRunning () {
+
+        return this.complete !== true
     }
 }
 

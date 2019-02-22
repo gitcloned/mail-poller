@@ -20,6 +20,11 @@ const runSchema = new Schema({
     total_time: Number,
     fetch_time: Number,
 
+    state: {
+        type: String,
+        enum: ["Running", "Completed", "Errored"]
+    },
+
     failed: {
         type: Boolean,
         default: false

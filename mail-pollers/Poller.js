@@ -30,6 +30,8 @@ class Poller extends EventEmitter {
         this.started = false
 
         this.last_seen = null
+
+        this.last_run = null
     }
 
     stop() {
@@ -85,7 +87,14 @@ class Poller extends EventEmitter {
 
         that.interval = setInterval(() => {
 
+            if (that.last_run && that.last_run.isRunning()) {
+                console.log("Last run {%s} is still running", that.last_run.runId)
+                return
+            }
+
             var run = backend.run(pollerName, config)
+
+            that.last_run = run
 
             run.search_criteria = that.parseSearchCriteria(run)
             run.fetch_options = that.fetch_options
