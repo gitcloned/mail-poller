@@ -172,7 +172,7 @@ mailBackend.init((err) => {
                     /**
                      * create mail poller
                      */
-                    var pollerName = properties.path()[module].poller || "default"
+                    var pollerName = properties.path()[module].poller || "default-poller"
                     var poller = null
 
                     if (pollers[pollerName]) {

@@ -11,15 +11,23 @@ const date_keys = ['date']
 
 const parseEmailAddress = (addresses) => {
 
-    console.log(addresses)
-    console.log(typeof addresses)
-
     if (!(addresses instanceof Array))
         addresses = [addresses]
+
+    var list = []
+
+    for (var i = 0; i < addresses.length; i++) {
+	if (addresses[i].split(",").length > 1) list = list.concat(addresses[i].split(","))
+	else list.push(addresses[i])
+    }
+
+    addresses = list
 
     for (var i = 0; i < addresses.length; i++) {
 
         var parsed = addrs.parseOneAddress(addresses[i].toString())
+
+        if (!parsed) continue
 
         addresses[i] = {
             "name": parsed.name,
