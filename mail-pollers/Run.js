@@ -68,39 +68,6 @@ class Run {
         this.model.saved_at = saved_at
     }
 
-    /**
-     * Mark run as emitted
-     * @param {object} err
-     */
-    emitted(options) {
-
-        var completed_at = moment.utc().toDate()
-
-        this.model.completed_at = completed_at
-        this.model.state = "Completed"
-
-        this.complete()
-    }
-
-    /**
-     * Mark run as failed
-     * @param {object} err
-     * @param {string} state
-     */
-    failed(err, state) {
-
-        var completed_at = moment.utc().toDate()
-
-        this.model.completed_at = completed_at
-        this.model.failed = true
-        this.model.state = "Errored"
-
-        this.failures.push({
-            at: state,
-            err: err
-        })
-    }
-
     save(errors, saved_mails, existing_mails) {
 
         // console.log([errors, saved_mails, existing_mails])
@@ -113,6 +80,11 @@ class Run {
         this.model.total_time = new Date() - this.created_at
 
         this.model.failures = this.failures.concat(errors)
+
+        this.model.completed_at = completed_at
+        this.model.state = this.model.failures.length > 0 ? "Errored" : "Completed"
+
+        this.complete()
 
         this.model.save((err) => {
             console.log(err)
@@ -162,7 +134,7 @@ class Run {
 
     isRunning () {
 
-        return this.complete !== true
+        return this.completed !== true
     }
 }
 

@@ -120,8 +120,6 @@ class Poller extends EventEmitter {
                 if (saved_mails.length + existing_mails.length > 0) {
 
                     that.emit('mails', saved_mails, existing_mails)
-
-                    run.emitted()
                 }
 
                 // save run
