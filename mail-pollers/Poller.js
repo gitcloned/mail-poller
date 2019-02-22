@@ -105,6 +105,10 @@ class Poller extends EventEmitter {
                 var saved_mails = []
                 var existing_mails = []
 
+                if (err) errors.push(err)
+
+                results = results || []
+
                 for (var i=0; i<results.length; i++) {
 
                     if (results[i].value) {
