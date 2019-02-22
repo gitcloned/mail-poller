@@ -32,4 +32,4 @@ class NoBackend {
     }
 }
 
-module.exports = S3
+module.exports = NoBackend
