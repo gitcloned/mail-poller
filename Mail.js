@@ -61,7 +61,7 @@ class Mail {
             self.runInfo = mailDoc.runInfo
             self.attachments = mailDoc.attachments
 
-            callback(null, true)
+            callback(null, self)
         })
     }
 }
