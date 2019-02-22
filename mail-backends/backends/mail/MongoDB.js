@@ -102,6 +102,13 @@ class MongoDB {
 
         return new Run(pollerName, pollerConfig, this.clientname, this.run_model)
     }
+
+    findMail (id, callback) {
+
+        var Model = this.model
+
+        Model.findOne({messageId: id}, callback)
+    }
 }
 
 module.exports = MongoDB

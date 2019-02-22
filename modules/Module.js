@@ -43,11 +43,41 @@ class Module {
             console.log("subscribing on topic: %s", topic)
 
             subscriber.subscribe(topic, (err, message) => {
-                console.log(' [%s] got message of client {%s}, err: %s', name, message.clientname, err)
+
+                if (err) {
+                    return console.log("error occurred while getting message over topic, err: %s", err.toString())
+                }
+
+                console.log(' [%s] got message of client {%s}', name, message.clientname)
                 console.log(message.mails.toString())
 
-                if (!err)
-                    handler.handle(message)
+                var task = (mail, next) => {
+
+                    return next(null, async.reflect(function (callback) {
+                        new Mail(clientname, mail).fetch(mailBackend, callback)
+                    }))
+                }
+
+                /**
+                 * save mail objects
+                 */
+                async.map(message.mails, task, (err, tasks) => {
+
+                    async.parallelLimit(tasks, 10, (err, results) => {
+
+                        if (err) {
+                            console.log(" error while fetching mails for messages, err: %s", err)
+                        } else {
+
+                            if (!err && clientname === message.clientname)
+                                handler.handle({
+                                    clientname: clientname,
+                                    mails: results,
+                                    run: message.run
+                                })
+                        }
+                    })
+                })
             })
         }
 
