@@ -88,6 +88,11 @@ class MailBackend {
 
         return this.mail_backend.run(pollerName, pollerConfig)
     }
+
+    findMail (id, callback) {
+
+        this.mail_backend.findMail(id, callback)
+    }
 }
 
 module.exports = MailBackend
