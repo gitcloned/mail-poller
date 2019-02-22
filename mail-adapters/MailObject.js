@@ -15,6 +15,9 @@ const parseEmailAddress = (addresses) => {
         addresses = [addresses]
 
     for (var i = 0; i < addresses.length; i++) {
+
+        console.log(addresses[i])
+
         var parsed = addrs.parseOneAddress(addresses[i].toString())
 
         addresses[i] = {
