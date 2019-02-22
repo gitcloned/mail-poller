@@ -23,6 +23,11 @@ class Mailbox extends EventEmitter {
         else if (this.mail_config['tls'] == 'true')
             this.mail_config['tls'] = true
 
+        if (this.mail_config['mark_seen'] == 'false')
+            this.mail_config['mark_seen'] = false
+        else if (this.mail_config['mark_seen'] == 'true')
+            this.mail_config['mark_seen'] = true
+
         this.connection_config['retry'] = this.connection_config['retry'] || {
             times: 0,
             interval: 1000
@@ -87,9 +92,7 @@ class Mailbox extends EventEmitter {
     }
 
     parseSearchCriteria(search_criteria) {
-        //console.log(typeof search_criteria)
         return JSON.parse(search_criteria)
-        return JSON.parse('{"s":' + search_criteria + '}')
     }
 
     poll(run, callback) {
@@ -126,7 +129,9 @@ class Mailbox extends EventEmitter {
 
             var task = (mail, next) => {
 
-                return next(null, async.reflect(function(callback) { new MailObject(clientname, mail).save(mailBackend, connection, run.info(), callback) }))
+                return next(null, async.reflect(function (callback) {
+                    new MailObject(clientname, mail).save(mailBackend, connection, run.info(), callback)
+                }))
             }
 
             /**
