@@ -40,6 +40,8 @@ class Run {
         this.model.created_at = this.created_at
         this.model.state = "Running"
 
+        console.log("registered run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
+
         this.model.save((err) => {
             console.log(err)
         })
@@ -88,6 +90,8 @@ class Run {
         this.model.state = this.model.failures.length > 0 ? "Errored" : "Completed"
 
         this.complete()
+
+        console.log("completed run {%s} for poller {%s} for client {%s} with state {%s}", this.runId, this.pollerName, this.clientName, this.model.state)
 
         this.model.save((err) => {
             console.log(err)
