@@ -47,7 +47,7 @@ class Module {
                 console.log(message.mails.toString())
 
                 if (!err)
-                    handler(message)
+                    handler.handle(message)
             })
         }
 
