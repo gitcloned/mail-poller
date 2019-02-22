@@ -25,12 +25,12 @@ class Module {
         this.publish = ["all", "new_mails_only"].indexOf(this.config.pubsub.publish) > -1 ? this.config.pubsub.publish : "new_mails_only"
     }
 
-    setPublisher (publisher) {
+    setPublisher(publisher) {
         this.publisher = publisher
         return this
     }
 
-    setSubscriber (subscriber, mailBackend) {
+    setSubscriber(subscriber, mailBackend, handler) {
         this.subscriber = subscriber
 
         if (this.topic_exists) {
@@ -43,6 +43,9 @@ class Module {
             subscriber.subscribe(topic, (err, message) => {
                 console.log(' [%s] got message, err: %s', name, err)
                 console.log(message.toString())
+
+                if (!err)
+                    handler(message)
             })
         }
 

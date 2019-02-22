@@ -80,6 +80,34 @@ var isValidConfigFile = function (val) {
     return properties
 }
 
+var isValidHandler = function (val) {
+
+    if (!fs.existsSync(val)) {
+        console.log("\n" + fixColors(colors.grey("File not found: " + val)))
+        return false
+    }
+
+    var handler = null
+
+    try {
+        handler = require(val)
+    } catch (e) {
+        console.log("\n" + fixColors(colors.grey("Not a valid js file to import: " + val)))
+        console.log(e)
+        return false
+    }
+
+    if (typeof handler.handler !== "function") {
+        console.log("\n" + fixColors(colors.grey("handle method not implemented. Not a valid handler file: " + val)) + "\n\n")
+
+        console.log("/* called as mails are fetched, passed array of Mail object */\nmodule.exports.handle = function (mails) {\n    // write your code here \n}")
+
+        return false
+    }
+
+    return handler
+}
+
 var program = require('commander');
 var colors = require('colors');
 var PropertiesReader = require('properties-reader');
@@ -91,8 +119,10 @@ program
     .option('-c, --clientname <string>', 'clientname')
     .option('--config <file>', 'config file (property)', isValidConfigFile)
     .option('-m, --module <string>', 'module')
+    .option('-h, --handler <filepath>', 'module', isValidHandler)
 
     .parse(process.argv);
+
 
 if (!program.clientname) return help("Do specify a valid clientname")
 
@@ -100,7 +130,13 @@ if (!program.module) return help("Do specify a valid module name")
 
 if (!program.config) return help("Do specify a valid mail config")
 
+if (!program.handler) return help("Do specify a valid mail handler")
+
+
 var properties = program.config
+var handler = program.handler
+
+
 
 if (program.box) properties.set('mail.box', program.box)
 
@@ -150,5 +186,5 @@ mailBackend.init((err) => {
 
     var Module = require('./modules/Module')
 
-    var module = new Module(program.module, program.clientname, properties.path()[program.module]).setSubscriber(subscriber)
+    var module = new Module(program.module, program.clientname, properties.path()[program.module]).setSubscriber(subscriber, mailBackend, handler)
 })
