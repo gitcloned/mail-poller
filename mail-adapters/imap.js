@@ -23,11 +23,6 @@ class Mailbox extends EventEmitter {
         else if (this.mail_config['tls'] == 'true')
             this.mail_config['tls'] = true
 
-        if (this.mail_config['mark_seen'] == 'false')
-            this.mail_config['mark_seen'] = false
-        else if (this.mail_config['mark_seen'] == 'true')
-            this.mail_config['mark_seen'] = true
-
         this.connection_config['retry'] = this.connection_config['retry'] || {
             times: 0,
             interval: 1000

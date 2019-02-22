@@ -24,6 +24,11 @@ class Poller extends EventEmitter {
         // fetch options
         this.fetch_options = JSON.parse(this.pollerConfig.fetch_options || '{ "bodies": ["HEADER", "TEXT"], "struct": true }')
 
+        if (this.pollerConfig['mark_seen'] == 'false')
+            this.fetch_options['markSeen'] = false
+        else if (this.pollerConfig['mark_seen'] == 'true')
+            this.fetch_options['markSeen'] = true
+
         this.backend = mailBackend
         this.interval = null
 
@@ -56,7 +61,7 @@ class Poller extends EventEmitter {
 
                     var range = run.timeRangeCriteria(criteria[0], criteria[1], this.lastSeen())
 
-                    for (var j=0; j<range.length; j++) {
+                    for (var j = 0; j < range.length; j++) {
                         parsed_search_criteria.push(range[j])
                     }
 
@@ -109,7 +114,7 @@ class Poller extends EventEmitter {
 
                 results = results || []
 
-                for (var i=0; i<results.length; i++) {
+                for (var i = 0; i < results.length; i++) {
 
                     if (results[i].value) {
                         if (results[i].value[1] === true) {
