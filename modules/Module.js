@@ -7,6 +7,7 @@ class Module {
 
         this.name = name
         this.config = config
+        this.clientname = clientname
 
         this.publisher = null
         this.subscriber = null
@@ -37,12 +38,13 @@ class Module {
 
             const topic = this.topic
             const name = this.name
+            const clientname = this.clientname
 
             console.log("subscribing on topic: %s", topic)
 
             subscriber.subscribe(topic, (err, message) => {
-                console.log(' [%s] got message, err: %s', name, err)
-                console.log(message.toString())
+                console.log(' [%s] got message of client {%s}, err: %s', name, message.clientname, err)
+                console.log(message.mails.toString())
 
                 if (!err)
                     handler(message)
@@ -59,8 +61,9 @@ class Module {
             var publisher = this.publisher
             const topic = this.topic
             const publish = this.publish
+            const clientname = this.clientname
 
-            poller.on('mails', (saved_mails, existing_mails) => {
+            poller.on('mails', (saved_mails, existing_mails, run_info) => {
 
                 var mails = []
 
@@ -71,7 +74,11 @@ class Module {
 
                 if (mails.length) {
 
-                    publisher.publish(topic, mails, (err) => {
+                    publisher.publish(topic, {
+                        clientname: clientname,
+                        mails: mails,
+                        run: run_info
+                    }, (err) => {
                         console.log(" published to topic (%s), err: %s", topic, err)
                     })
                 }
