@@ -139,6 +139,8 @@ class Poller extends EventEmitter {
             })
         }, config.frequency * 1000)
 
+        console.log(" {%s} poller started", this.name)
+
         callback(null)
     }
 
