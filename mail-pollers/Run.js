@@ -77,11 +77,12 @@ class Run {
 
         this.model.existing_ids = existing_mails
 
-        this.model.total_time = new Date() - this.created_at
+        this.model.completed_at = new Date()
+
+        this.model.total_time = this.model.completed_at - this.created_at
 
         this.model.failures = this.failures.concat(errors)
 
-        this.model.completed_at = completed_at
         this.model.state = this.model.failures.length > 0 ? "Errored" : "Completed"
 
         this.complete()
