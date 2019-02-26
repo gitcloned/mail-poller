@@ -14,6 +14,8 @@ class Poller extends EventEmitter {
         this.mailAdapter = mailAdapter
         this.pollerConfig = pollerConfig
 
+        this.connection = null
+
         // parse freq, default: 30s
         this.pollerConfig.frequency = this.pollerConfig.frequency || '30s'
         this.pollerConfig.frequency = parseInt(this.pollerConfig.frequency)
@@ -44,6 +46,11 @@ class Poller extends EventEmitter {
         clearInterval(this.interval)
         this.interval = null
         this.started = false
+
+        if (this.connection) {
+            this.connection.close()
+            this.connection = null
+        }
     }
 
     parseSearchCriteria(run) {
@@ -88,56 +95,61 @@ class Poller extends EventEmitter {
 
         var that = this
 
-        that.started = true
+        mailAdapter.connect().on('connect', (connection) => {
 
-        that.interval = setInterval(() => {
+            that.started = true
 
-            if (that.last_run && that.last_run.isRunning()) {
-                console.log("Last run {%s} is still running", that.last_run.runId)
-                return
-            }
+            that.connection = connection
 
-            var run = backend.run(pollerName, config)
+            that.interval = setInterval(() => {
 
-            that.last_run = run
-
-            run.search_criteria = that.parseSearchCriteria(run)
-            run.fetch_options = that.fetch_options
-
-            mailAdapter.poll(run, (err, results) => {
-
-                var errors = []
-                var saved_mails = []
-                var existing_mails = []
-
-                if (err) errors.push(err)
-
-                results = results || []
-
-                for (var i = 0; i < results.length; i++) {
-
-                    if (results[i].value) {
-                        if (results[i].value[1] === true) {
-                            existing_mails.push(results[i].value[0])
-                        } else {
-                            saved_mails.push(results[i].value[0])
-                        }
-                    } else
-                        errors.push(results[i].error)
+                if (that.last_run && that.last_run.isRunning()) {
+                    console.log("Last run {%s} is still running", that.last_run.runId)
+                    return
                 }
 
-                if (saved_mails.length + existing_mails.length > 0) {
+                var run = backend.run(pollerName, config)
 
-                    that.emit('mails', saved_mails, existing_mails, run.info())
-                }
+                that.last_run = run
 
-                // save run
-                run.save(errors, saved_mails, existing_mails)
+                run.search_criteria = that.parseSearchCriteria(run)
+                run.fetch_options = that.fetch_options
 
-                // set the last seen as the current run created_at
-                that.last_seen = run.created_at
-            })
-        }, config.frequency * 1000)
+                mailAdapter.poll(connection, run, (err, results) => {
+
+                    var errors = []
+                    var saved_mails = []
+                    var existing_mails = []
+
+                    if (err) errors.push(err)
+
+                    results = results || []
+
+                    for (var i = 0; i < results.length; i++) {
+
+                        if (results[i].value) {
+                            if (results[i].value[1] === true) {
+                                existing_mails.push(results[i].value[0])
+                            } else {
+                                saved_mails.push(results[i].value[0])
+                            }
+                        } else
+                            errors.push(results[i].error)
+                    }
+
+                    if (saved_mails.length + existing_mails.length > 0) {
+
+                        that.emit('mails', saved_mails, existing_mails, run.info())
+                    }
+
+                    // save run
+                    run.save(errors, saved_mails, existing_mails)
+
+                    // set the last seen as the current run created_at
+                    that.last_seen = run.created_at
+                })
+            }, config.frequency * 1000)
+        })
 
         console.log(" {%s} poller started", this.name)
 

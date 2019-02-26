@@ -153,51 +153,48 @@ mailBackend.init((err) => {
 
     if (err) return
 
-    mailAdapter.connect().on('connect', () => {
+    var modules = properties.path().modules
 
-        var modules = properties.path().modules
+    console.log('registering modules\n')
 
-        console.log('registering modules\n')
+    const registered_modules = []
+    const pollers = {}
 
-        const registered_modules = []
-        const pollers = {}
+    for (var module in modules) {
+        if (modules.hasOwnProperty(module) && modules[module] == 'true') {
 
-        for (var module in modules) {
-            if (modules.hasOwnProperty(module) && modules[module] == 'true') {
+            try {
 
-                try {
+                var Module = require('./modules/Module')
 
-                    var Module = require('./modules/Module')
+                /**
+                 * create mail poller
+                 */
+                var pollerName = properties.path()[module].poller || "default-poller"
+                var poller = null
+
+                if (pollers[pollerName]) {
+                    poller = pollers[pollerName]
+                } else {
+                    poller = new Poller(program.clientname, pollerName, mailAdapter, properties.path()["poller-" + pollerName], mailBackend)
+                }
+
+                poller.start(mailAdapter, (err) => {
 
                     /**
-                     * create mail poller
+                     * create module and set mail adapter
                      */
-                    var pollerName = properties.path()[module].poller || "default-poller"
-                    var poller = null
+                    registered_modules.push(new Module(module, program.clientname, properties.path()[module]).setPublisher(publisher).setPoller(poller))
 
-                    if (pollers[pollerName]) {
-                        poller = pollers[pollerName]
-                    } else {
-                        poller = new Poller(program.clientname, pollerName, mailAdapter, properties.path()["poller-" + pollerName], mailBackend)
-                    }
+                    console.log(fixColors(colors.green(" + [" + module + "]")))
+                })
+            } catch (e) {
 
-                    poller.start((err) => {
-
-                        /**
-                         * create module and set mail adapter
-                         */
-                        registered_modules.push(new Module(module, program.clientname, properties.path()[module]).setPublisher(publisher).setPoller(poller))
-
-                        console.log(fixColors(colors.green(" + [" + module + "]")))
-                    })
-                } catch (e) {
-
-                    console.log(e)
-                    console.log(fixColors(colors.bgRed("Unknown module specified '" + module + "'")))
-                }
+                console.log(e)
+                console.log(fixColors(colors.bgRed("Unknown module specified '" + module + "'")))
             }
         }
+    }
 
-        console.log("")
-    })
+    console.log("")
 })

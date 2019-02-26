@@ -77,9 +77,9 @@ class Mailbox extends EventEmitter {
             return this.connection !== null
         }
 
-        this.connection = connection
+        // this.connection = connection
 
-        this.emit('connect')
+        this.emit('connect', connection)
     }
 
     parseFetchOptions(fetch_options) {
@@ -90,7 +90,7 @@ class Mailbox extends EventEmitter {
         return JSON.parse(search_criteria)
     }
 
-    poll(run, callback) {
+    poll(connection, run, callback) {
 
         var search_criteria = run.searchCriteria()
         var fetch_options = run.fetchOptions()
@@ -104,7 +104,7 @@ class Mailbox extends EventEmitter {
         // fetch_options = { bodies: ['HEADER.FIELDS (FROM TO SUBJECT DATE)'], struct: true }
         // fetch_options = { bodies: ['HEADER', 'TEXT'], struct: true }
 
-        var connection = this.connection
+        // var connection = this.connection
         var clientname = this.clientname
         var mailBackend = this.mailBackend
 
