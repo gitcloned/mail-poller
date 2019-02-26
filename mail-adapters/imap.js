@@ -64,6 +64,8 @@ class Mailbox extends EventEmitter {
                 return;
             }
 
+            console.log(" - connected, returning connection with name: %s", result.name)
+
             that.connected(result)
         })
 
