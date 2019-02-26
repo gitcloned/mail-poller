@@ -8,6 +8,14 @@ class Run {
         this.pollerName = pollerName
         this.pollerConfig = pollerConfig
 
+        let tags = JSON.parse(pollerConfig.tags || [])
+
+        this.pollertags = {}
+
+        for (var i=0; i<tags.length; i++) {
+            this.pollerTags[tags[i][0]] = tags[i][1]
+        }
+
         this.runId = uuidv1()
         this.clientName = clientName
 
@@ -105,12 +113,17 @@ class Run {
             poller: this.pollerName,
             clientname: this.clientName,
             id: this.runId,
-            box: this.box()
+            box: this.box(),
+            tags: this.tags()
         }
     }
 
     box() {
         return this.pollerConfig.box
+    }
+
+    tags () {
+        return this.pollertags
     }
 
     searchCriteria() {

@@ -50,7 +50,7 @@ class Mailbox extends EventEmitter {
             })
         }
 
-        console.log('connecting to mailbox: %s', mail_config.user)
+        // console.log('connecting to mailbox: %s', mail_config.user)
 
         var that = this
         async.retry(connection_config.retry, task, (err, result) => {

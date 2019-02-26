@@ -30,7 +30,7 @@ class Poller extends EventEmitter {
             this.fetch_options['markSeen'] = false
         else if (this.pollerConfig['mark_seen'] == 'true')
             this.fetch_options['markSeen'] = true
-
+        
         this.backend = mailBackend
         this.interval = null
 
@@ -101,8 +101,6 @@ class Poller extends EventEmitter {
 
             that.connection = connection
 
-            console.log(" - got connection with name: %s", connection.name)
-
             that.interval = setInterval(() => {
 
                 if (that.last_run && that.last_run.isRunning()) {
@@ -151,9 +149,9 @@ class Poller extends EventEmitter {
                     that.last_seen = run.created_at
                 })
             }, config.frequency * 1000)
-        })
 
-        console.log(" {%s} poller started", this.name)
+            console.log(" {%s} poller started", this.name)
+        })
 
         callback(null)
     }

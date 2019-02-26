@@ -222,7 +222,7 @@ class MailObject {
                 at: "parsing"
             })
 
-            console.log(" saving mail object for poller {%s} ", pollerName)
+            // console.log(" saving mail object for poller {%s} ", pollerName)
 
             var messageId = mail.messageId[0]
 
