@@ -95,7 +95,7 @@ class Poller extends EventEmitter {
 
         var that = this
 
-        mailAdapter.connect().on('connect.' + pollerName, (connection) => {
+        mailAdapter.connect(pollerName).on('connect.' + pollerName, (connection) => {
 
             that.started = true
 
