@@ -10,7 +10,7 @@ class Run {
 
         let tags = JSON.parse(pollerConfig.tags || [])
 
-        this.pollertags = {}
+        this.pollerTags = {}
 
         for (var i=0; i<tags.length; i++) {
             this.pollerTags[tags[i][0]] = tags[i][1]
@@ -19,7 +19,7 @@ class Run {
         this.runId = uuidv1()
         this.clientName = clientName
 
-        console.log("creating run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
+        //console.log("creating run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
 
         this.model = new Model()
 
@@ -48,7 +48,7 @@ class Run {
         this.model.created_at = this.created_at
         this.model.state = "Running"
 
-        console.log("registered run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
+        // console.log("registered run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
 
         this.model.save((err) => {
             console.log(err)
@@ -99,7 +99,7 @@ class Run {
 
         this.complete()
 
-        console.log("completed run {%s} for poller {%s} for client {%s} with state {%s}", this.runId, this.pollerName, this.clientName, this.model.state)
+        //console.log("completed run {%s} for poller {%s} for client {%s} with state {%s}", this.runId, this.pollerName, this.clientName, this.model.state)
 
         this.model.save((err) => {
             console.log(err)
@@ -123,7 +123,7 @@ class Run {
     }
 
     tags () {
-        return this.pollertags
+        return this.pollerTags
     }
 
     searchCriteria() {
