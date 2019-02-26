@@ -95,12 +95,13 @@ class Poller extends EventEmitter {
 
         var that = this
 
-        mailAdapter.connect().on('connect', (connection) => {
+        mailAdapter.connect().on('connect.' + pollerName, (connection) => {
 
             that.started = true
 
             that.connection = connection
-            that.connection.name = pollerName
+
+            console.log(" - got connection with name: %s", connection.name)
 
             that.interval = setInterval(() => {
 

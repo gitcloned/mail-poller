@@ -33,7 +33,7 @@ class Mailbox extends EventEmitter {
         this.connection = null;
     }
 
-    connect() {
+    connect(name) {
 
         if (this.connected()) return this
 
@@ -64,15 +64,14 @@ class Mailbox extends EventEmitter {
                 return;
             }
 
-            console.log(" - connected, returning connection with name: %s", result.name)
-
-            that.connected(result)
+            result.name = name
+            that.connected(result, name)
         })
 
         return this
     }
 
-    connected(connection) {
+    connected(connection, name) {
 
         if (!connection) {
 
@@ -81,7 +80,7 @@ class Mailbox extends EventEmitter {
 
         // this.connection = connection
 
-        this.emit('connect', connection)
+        this.emit('connect.' + name, connection)
     }
 
     parseFetchOptions(fetch_options) {
