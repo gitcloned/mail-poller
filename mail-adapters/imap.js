@@ -112,7 +112,7 @@ class Mailbox extends EventEmitter {
 
         connection.openBox(box).then(function () {
 
-            console.log(search_criteria, fetch_options)
+            console.log(connection.name, search_criteria, fetch_options)
 
             return connection.search(search_criteria, fetch_options)
 
@@ -120,12 +120,12 @@ class Mailbox extends EventEmitter {
 
             run.fetched(mails.length)
 
-            console.log(" - [%s] got %s mails {%s}", box, mails.length, run.runId)
+            console.log(" - [%s] got %s mails {%s} with conn: %s", box, mails.length, run.runId, connection.name)
 
             var task = (mail, next) => {
 
                 return next(null, async.reflect(function (callback) {
-                    new MailObject(clientname, mail).save(mailBackend, connection, run.info(), callback)
+                    new MailObject(clientname, run.info().poller, mail).save(mailBackend, connection, run.info(), callback)
                 }))
             }
 

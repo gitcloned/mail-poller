@@ -50,9 +50,10 @@ const parseError = (err) => {
 
 class MailObject {
 
-    constructor(clientname, message) {
+    constructor(clientname, pollerName, message) {
 
         this.clientname = clientname
+        this.pollerName = pollerName
         this.message = message
 
         this.parsed = false
@@ -210,6 +211,8 @@ class MailObject {
         if (this.saved) return callback()
 
         var that = this
+        var pollerName = this.pollerName
+        var clientname = this.clientname
 
         this.parse(connection, (err, mail) => {
 
@@ -218,6 +221,8 @@ class MailObject {
                 err: parseError(err),
                 at: "parsing"
             })
+
+            console.log(" saving mail object for poller {%s} ")
 
             var messageId = mail.messageId[0]
 

@@ -100,6 +100,7 @@ class Poller extends EventEmitter {
             that.started = true
 
             that.connection = connection
+            that.connection.name = pollerName
 
             that.interval = setInterval(() => {
 

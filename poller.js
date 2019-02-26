@@ -179,7 +179,7 @@ mailBackend.init((err) => {
                     poller = new Poller(program.clientname, pollerName, mailAdapter, properties.path()["poller-" + pollerName], mailBackend)
                 }
 
-                poller.start(mailAdapter, (err) => {
+                poller.start((err) => {
 
                     /**
                      * create module and set mail adapter
