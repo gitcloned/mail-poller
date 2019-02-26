@@ -31,6 +31,10 @@ class MailBackend {
                 var S3 = require('./backends/attachments/S3')
                 this.attachment_backend = new S3(clientname, config.s3)
                 break
+            case "sftp":
+                var SFTP = require('./backends/attachments/SFTP')
+                this.attachment_backend = new SFTP(clientname, config.sftp)
+                break
             default:
                 var NoBackend = require('./backends/attachments/NoBackend')
                 this.attachment_backend = new NoBackend(clientname, {})
@@ -89,7 +93,7 @@ class MailBackend {
         return this.mail_backend.run(pollerName, pollerConfig)
     }
 
-    findMail (id, callback) {
+    findMail(id, callback) {
 
         this.mail_backend.findMail(id, callback)
     }
