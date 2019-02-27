@@ -19,8 +19,6 @@ class Run {
         this.runId = uuidv1()
         this.clientName = clientName
 
-        //console.log("creating run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
-
         this.model = new Model()
 
         this.created_at = moment.utc().toDate()
@@ -34,6 +32,8 @@ class Run {
         this.failures = []
 
         this.completed = false
+
+        this.heartbeat = 0
     }
 
     /**
@@ -47,8 +47,6 @@ class Run {
         this.model.clientName = this.clientName
         this.model.created_at = this.created_at
         this.model.state = "Running"
-
-        // console.log("registered run {%s} for poller {%s} for client {%s}", this.runId, this.pollerName, this.clientName)
 
         this.model.save((err) => {
             console.log(err)
@@ -82,8 +80,6 @@ class Run {
 
     save(errors, saved_mails, existing_mails) {
 
-        // console.log([errors, saved_mails, existing_mails])
-
         this.model.saved_cnt = saved_mails.length
         this.model.saved_ids = saved_mails
 
@@ -99,7 +95,8 @@ class Run {
 
         this.complete()
 
-        //console.log("completed run {%s} for poller {%s} for client {%s} with state {%s}", this.runId, this.pollerName, this.clientName, this.model.state)
+        if (errors.length)
+            console.log(errors)
 
         this.model.save((err) => {
             console.log(err)
@@ -155,6 +152,15 @@ class Run {
     isRunning () {
 
         return this.completed !== true
+    }
+
+    stillRunning () {
+
+        this.heartbeat++
+    }
+
+    kill () {
+
     }
 }
 

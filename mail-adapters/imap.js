@@ -113,7 +113,7 @@ class Mailbox extends EventEmitter {
 
         connection.openBox(box).then(function () {
 
-            console.log(connection.name, search_criteria, fetch_options)
+            // console.log(connection.name, search_criteria, fetch_options)
 
             return connection.search(search_criteria, fetch_options)
 
@@ -150,8 +150,6 @@ class Mailbox extends EventEmitter {
                 })
             })
         }).catch((err) => {
-
-            console.log(err)
 
             callback({
                 at: "fetching",

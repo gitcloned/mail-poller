@@ -32,8 +32,6 @@ class SFTP {
 
     saveBodyAndAttachments(id, mail, callback) {
 
-        console.log("saving mail body and attachments: %s", id)
-
         var attachments = mail.attachments
 
         var body = mail.body
@@ -46,6 +44,10 @@ class SFTP {
 
         let Client = require('ssh2-sftp-client');
         let sftp = new Client();
+
+        sftp.once('error', (err) => {
+            callback(err)
+        })
 
         var options = {
             host: config.host,
@@ -73,15 +75,14 @@ class SFTP {
                     let tempFilePath = [tempDir, object.storage.filename].join("/")
                     let remoteFilePath = [object.storage.folder, object.storage.filename].join("/")
 
-                    console.log("uploading file: %s", remoteFilePath)
+                    console.log("\nuploading file: %s", remoteFilePath)
 
-                    sftp.put(Buffer.from(object.data.toString), remoteFilePath)
+                    sftp.put(Buffer.from(object.data.toString()), remoteFilePath)
                         .then(() => {
-                            console.log("uploaded file: %s", remoteFilePath)
+                            console.log(" - uploaded file: %s", remoteFilePath)
                             callback(null)
                         })
                         .catch((err) => {
-                            console.log(err)
                             callback(err)
                         })
 
@@ -100,9 +101,6 @@ class SFTP {
                     sftp.end()
 
                     if (err) {
-
-                        console.log("err while uloading to SFTP, err: %s", err)
-
                         return callback(err)
                     }
 
@@ -110,8 +108,7 @@ class SFTP {
                 })
             })
         }).catch((err) => {
-            console.log(err, 'catch error');
-
+            callback(err)
             sftp.end()
         })
 

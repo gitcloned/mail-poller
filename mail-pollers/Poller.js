@@ -105,7 +105,14 @@ class Poller extends EventEmitter {
 
                 if (that.last_run && that.last_run.isRunning()) {
                     console.log("Last run {%s} is still running", that.last_run.runId)
-                    return
+                    
+                    this.last_run.stillRunning()
+
+                    if (this.last_run.heartbeat > 20) {
+                        
+                        this.last_run.kill()
+                        this.last_run = null
+                    }
                 }
 
                 var run = backend.run(pollerName, config)
