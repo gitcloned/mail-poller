@@ -17,6 +17,7 @@ class SFTP {
         this.passphrase = fs.readFileSync(this.config.passphrase).toString()
 
         this.folder = this.config.folder
+        this.filename = this.config.filename
     }
 
     init(callback) {
@@ -69,8 +70,8 @@ class SFTP {
                     if (object.storage === null) callback(null)
 
                     let tempDir = [tempFolder, id].join("/")
-                    let tempFilePath = [tempDir, object.filename].join("/")
-                    let remoteFilePath = [object.storage.folder, object.filename].join("/")
+                    let tempFilePath = [tempDir, object.storage.filename].join("/")
+                    let remoteFilePath = [object.storage.folder, object.storage.filename].join("/")
 
                     console.log("uploading file: %s", remoteFilePath)
 
@@ -121,9 +122,9 @@ class SFTP {
 
         return {
             "type": "sftp",
-            "folder": format(this.folder, info)
+            "folder": format(this.folder, info),
+            "filename": this.filename ? format(this.filename, info) : this.filename
         }
-
     }
 }
 

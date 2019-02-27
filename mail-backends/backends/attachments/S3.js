@@ -19,6 +19,8 @@ class S3 {
             accessKeyId: this.config.accessKeyId,
             secretAccessKey: this.config.secretAccessKey
         })
+
+        this.filename = this.config.filename
     }
 
     init(callback) {
@@ -51,7 +53,7 @@ class S3 {
 
                 s3.upload({
                     Bucket: object.storage.bucket,
-                    Key: [object.storage.folder, object.filename].join("/"),
+                    Key: [object.storage.folder, object.storage.filename].join("/"),
                     Body: object.data
                 }, callback)
             })
@@ -80,7 +82,8 @@ class S3 {
         return {
             "type": "s3",
             "bucket": this.bucket,
-            "folder": format(this.folder, info)
+            "folder": format(this.folder, info),
+            "filename": this.filename ? format(this.filename, info) : this.filename
         }
     }
 }

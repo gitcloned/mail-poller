@@ -1,5 +1,6 @@
 const moment = require('moment')
 const fileExtension = require('file-extension')
+const format = require("stringformat")
 
 class MailBackend {
 
@@ -93,6 +94,11 @@ class MailBackend {
                 mail.attachments[i].storage = null
                 continue
             }
+
+            info.file = {}
+
+            info.file.name = filename.replace('.' + extn, '')
+            info.file.extn = extn
 
             mail.attachments[i].storage = this.attachment_backend.info(info, mail.attachments[i])
         }
