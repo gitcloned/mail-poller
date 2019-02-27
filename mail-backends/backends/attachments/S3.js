@@ -47,6 +47,8 @@ class S3 {
 
             return next(null, function (callback) {
 
+                if (object.storage === null) callback(null)
+
                 s3.upload({
                     Bucket: object.storage.bucket,
                     Key: [object.storage.folder, object.filename].join("/"),

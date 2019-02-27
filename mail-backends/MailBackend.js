@@ -1,3 +1,6 @@
+const moment = require('moment')
+const fileExtension = require('file-extension')
+
 class MailBackend {
 
     constructor(clientname, config) {
@@ -5,6 +8,15 @@ class MailBackend {
         this.clientname = clientname
         this.mail_backend = null
         this.attachment_backend = null
+
+        this.attachmentConfig = config.attachments || {}
+
+        if (this.attachmentConfig.skipBody === "true") this.attachmentConfig.skipBody = true
+        else this.attachmentConfig.skipBody = false
+
+        if (this.attachmentConfig.allowAttachments) this.attachmentConfig.allowAttachments = this.attachmentConfig.allowAttachments.split(",")
+        else this.attachmentConfig.allowAttachments = null
+
 
         console.log(' mail backend: [%s]', config.backend.mail)
         console.log(' attachment backend: [%s]', config.backend.attachments)
@@ -29,16 +41,16 @@ class MailBackend {
 
             case "s3":
                 var S3 = require('./backends/attachments/S3')
-                this.attachment_backend = new S3(clientname, config.s3)
+                this.attachment_backend = new S3(clientname, config.s3, config.attachments)
                 break
             case "sftp":
                 console.log(' creating SFTP backend')
                 var SFTP = require('./backends/attachments/SFTP')
-                this.attachment_backend = new SFTP(clientname, config.sftp)
+                this.attachment_backend = new SFTP(clientname, config.sftp, config.attachments)
                 break
             default:
                 var NoBackend = require('./backends/attachments/NoBackend')
-                this.attachment_backend = new NoBackend(clientname, {})
+                this.attachment_backend = new NoBackend(clientname, {}, config.attachments)
                 break
         }
     }
@@ -61,15 +73,29 @@ class MailBackend {
             year: date.getFullYear(),
             month: date.getMonth(),
             day: date.getDay(),
+            mmddyyyy: moment(date).format("MM/dd/yyyy"),
             messageId: messageId,
             clientname: clientname,
             runInfo: mail.runInfo
         }
 
-        mail.body.storage = this.attachment_backend.info(info, mail.body)
+        if (this.attachmentConfig.skipBody)
+            mail.body.storage = null
+        else
+            mail.body.storage = this.attachment_backend.info(info, mail.body)
 
-        for (var i = 0; i < mail.attachments.length; i++)
+        for (var i = 0; i < mail.attachments.length; i++) {
+
+            var filename = mail.attachments[i].filename
+            var extn = fileExtension(filename)
+
+            if (this.attachmentConfig.allowAttachments && this.attachmentConfig.allowAttachments.indexOf(extn) === -1) {
+                mail.attachments[i].storage = null
+                continue
+            }
+
             mail.attachments[i].storage = this.attachment_backend.info(info, mail.attachments[i])
+        }
 
         info = null
 

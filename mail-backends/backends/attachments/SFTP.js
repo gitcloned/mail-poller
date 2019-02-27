@@ -56,22 +56,24 @@ class SFTP {
         sftp.connect(options).then(() => {
 
             console.log("connected to SFTP")
-            
+
             var cleanup = (filePath) => {
                 if (fs.existsSync(filePath))
                     fs.rmdirSync(filePath)
             }
-    
+
             var task = (object, next) => {
-    
+
                 return next(null, function (callback) {
-    
+
+                    if (object.storage === null) callback(null)
+
                     let tempDir = [tempFolder, id].join("/")
                     let tempFilePath = [tempDir, object.filename].join("/")
                     let remoteFilePath = [object.storage.folder, object.filename].join("/")
-    
+
                     console.log("uploading file: %s", remoteFilePath)
-    
+
                     sftp.put(Buffer.from(object.data.toString), remoteFilePath)
                         .then(() => {
                             console.log("uploaded file: %s", remoteFilePath)
@@ -81,28 +83,28 @@ class SFTP {
                             console.log(err)
                             callback(err)
                         })
-    
+
                 })
             }
-    
+
             var objectsToSave = attachments.concat([body])
-    
+
             /**
              * save mail objects
              */
             async.map(objectsToSave, task, (err, tasks) => {
-    
+
                 async.parallelLimit(tasks, 10, (err) => {
 
                     sftp.end()
-    
+
                     if (err) {
 
                         console.log("err while uloading to SFTP, err: %s", err)
 
                         return callback(err)
                     }
-    
+
                     callback(null)
                 })
             })
@@ -112,16 +114,10 @@ class SFTP {
             sftp.end()
         })
 
-        
+
     }
 
     info(info, object) {
-
-        console.log(info)
-	console.log(this.folder)
-        console.log(format(this.folder, info))
-
-	console.log("----------------")
 
         return {
             "type": "sftp",
