@@ -16,7 +16,7 @@ class SFTP {
         this.privateKey = fs.readFileSync(this.config.privateKey).toString()
         this.passphrase = fs.readFileSync(this.config.passphrase).toString()
 
-	this.folder = this.config.folder
+        this.folder = this.config.folder
     }
 
     init(callback) {
@@ -43,74 +43,71 @@ class SFTP {
         const passphrase = this.passphrase
         const tempFolder = this.tempFolder
 
-        var cleanup = (filePath) => {
-            if (fs.existsSync(filePath))
-                fs.rmdirSync(filePath)
+        let Client = require('ssh2-sftp-client');
+        let sftp = new Client();
+
+        var options = {
+            host: config.host,
+            username: config.username,
+            privateKey: privateKey,
+            passphrase: passphrase
         }
 
-        var task = (object, next) => {
+        sftp.connect(options).then(() => {
+            
+            var cleanup = (filePath) => {
+                if (fs.existsSync(filePath))
+                    fs.rmdirSync(filePath)
+            }
+    
+            var task = (object, next) => {
+    
+                return next(null, function (callback) {
+    
+                    let tempDir = [tempFolder, id].join("/")
+                    let tempFilePath = [tempDir, object.filename].join("/")
+                    let remoteFilePath = [object.storage.folder, object.filename].join("/")
+    
+                    console.log("uploading file: %s", remoteFilePath)
+    
+                    sftp.put(object.data, remoteFilePath)
+                        .then(() => {
+                            console.log("uploaded file: %s", remoteFilePath)
+                            callback(null)
+                        })
+                        .catch((err) => {
+                            console.log(err)
+                            callback(err)
+                        })
+    
+                })
+            }
+    
+            var objectsToSave = attachments.concat([body])
+    
+            /**
+             * save mail objects
+             */
+            async.map(objectsToSave, task, (err, tasks) => {
+    
+                async.parallelLimit(tasks, 10, (err) => {
 
-            return next(null, function (callback) {
-
-		let tempDir = [tempFolder, id].join("/")
-                let tempFilePath = [tempDir, object.filename].join("/")
-                let remoteFilePath = [object.storage.folder].join("/")
-
-		try {
-                    fs.mkdirSync(tempDir, { recursive: true })
-		} catch (e) {}
-
-                console.log(tempFilePath, remoteFilePath)
-
-                fs.writeFileSync(tempFilePath, object.data)
-
-                var options = {
-                        host: config.host,
-                        username: config.username,
-                        path: tempDir,
-                        remoteDir: remoteFilePath,
-                        privateKey: privateKey,
-                        passphrase: passphrase
-                    },
-                    sftp = new SftpUpload(options);
-
-                console.log(' uploading: %s', remoteFilePath)
-		console.log(options)
-
-                sftp.on('error', function (err) {
-                        cleanup(tempFilePath)
-                        callback(err)
-                    })
-                    .on('uploading', function (progress) {
-                        // console.log('Uploading ', progress.file);
-                        // console.log(progress.percent + '% completed');
-                    })
-                    .on('completed', function () {
-                        cleanup(tempFilePath)
-                        console.log('  - upload completed: %s', remoteFilePath)
-                        callback(null)
-                    })
-                    .upload();
-
+                    sftp.end()
+    
+                    if (err) {
+                        return callback(err)
+                    }
+    
+                    callback(null)
+                })
             })
-        }
+        }).catch((err) => {
+            console.log(err, 'catch error');
 
-        var objectsToSave = attachments.concat([body])
-
-        /**
-         * save mail objects
-         */
-        async.map(objectsToSave, task, (err, tasks) => {
-
-            async.parallelLimit(tasks, 10, (err) => {
-
-                if (err) {
-                    return callback(err)
-                }
-
-                callback(null)
-            })
+            sftp.end()
         })
+
+        
     }
 
     info(info, object) {
