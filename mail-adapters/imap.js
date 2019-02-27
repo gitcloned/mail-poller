@@ -128,7 +128,7 @@ class Mailbox extends EventEmitter {
             var task = (mail, next) => {
 
                 return next(null, async.reflect(function (callback) {
-                    console.log(mail)
+                    if (!mail) return callback("No mail body can be fetched")
                     new MailObject(clientname, run.info().poller, mail).save(mailBackend, connection, run.info(), callback)
                 }))
             }
