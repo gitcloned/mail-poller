@@ -1,4 +1,4 @@
-const format = require("string-template")
+const format = require("stringformat")
 const async = require('async')
 
 var SftpUpload = require('sftp-upload'),
@@ -72,7 +72,7 @@ class SFTP {
     
                     console.log("uploading file: %s", remoteFilePath)
     
-                    sftp.put(object.data, remoteFilePath)
+                    sftp.put(Buffer.from(object.data.toString), remoteFilePath)
                         .then(() => {
                             console.log("uploaded file: %s", remoteFilePath)
                             callback(null)
@@ -117,10 +117,17 @@ class SFTP {
 
     info(info, object) {
 
+        console.log(info)
+	console.log(this.folder)
+        console.log(format(this.folder, info))
+
+	console.log("----------------")
+
         return {
             "type": "sftp",
             "folder": format(this.folder, info)
         }
+
     }
 }
 
