@@ -47,7 +47,7 @@ class S3 {
 
             return next(null, function (callback) {
 
-                if (object.storage === null) callback(null)
+                if (object.storage === null) return callback(null)
 
                 s3.upload({
                     Bucket: object.storage.bucket,

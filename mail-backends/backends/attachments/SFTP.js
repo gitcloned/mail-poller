@@ -66,7 +66,7 @@ class SFTP {
 
                 return next(null, function (callback) {
 
-                    if (object.storage === null) callback(null)
+                    if (object.storage === null) return callback(null)
 
                     let tempDir = [tempFolder, id].join("/")
                     let tempFilePath = [tempDir, object.filename].join("/")

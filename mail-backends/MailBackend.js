@@ -74,6 +74,7 @@ class MailBackend {
             month: date.getMonth(),
             day: date.getDay(),
             mmddyyyy: moment(date).format("MM/dd/yyyy"),
+            mmddyyyyhhss: moment(date).format("MM/dd/yyyy-hh:mm:ss"),
             messageId: messageId,
             clientname: clientname,
             runInfo: mail.runInfo
