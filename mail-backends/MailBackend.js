@@ -62,13 +62,16 @@ class MailBackend {
             month: date.getMonth(),
             day: date.getDay(),
             messageId: messageId,
-            clientname: clientname
+            clientname: clientname,
+            runInfo: mail.runInfo
         }
 
         mail.body.storage = this.attachment_backend.info(info, mail.body)
 
         for (var i = 0; i < mail.attachments.length; i++)
             mail.attachments[i].storage = this.attachment_backend.info(info, mail.attachments[i])
+
+        info = null
 
         backend.saveMail(messageId, mail, (err, exists) => {
 
