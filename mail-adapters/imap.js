@@ -119,8 +119,6 @@ class Mailbox extends EventEmitter {
 
         }).then((mails) => {
 
-            mails = [mails[0]]
-
             run.fetched(mails.length)
 
             console.log(" - [%s] got %s mails {%s} with conn: %s", box, mails.length, run.runId, connection.name)

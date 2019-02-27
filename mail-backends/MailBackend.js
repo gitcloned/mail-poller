@@ -74,8 +74,8 @@ class MailBackend {
             year: date.getFullYear(),
             month: date.getMonth(),
             day: date.getDay(),
-            mmddyyyy: moment(date).format("MM/dd/yyyy"),
-            mmddyyyyhhss: moment(date).format("MM/dd/yyyy-hh:mm:ss"),
+            mmddyyyy: moment(date).format("MM-DD-YYYY"),
+            mmddyyyyhhss: moment(date).format("MM-DD-YYYY-hh-mm-ss"),
             messageId: messageId,
             clientname: clientname,
             runInfo: mail.runInfo
@@ -98,7 +98,7 @@ class MailBackend {
 
             info.file = {}
 
-            info.file.name = filename.replace('.' + extn, '')
+            info.file.name = filename.replace(new RegExp("." + extn, "i"), '')
             info.file.extn = extn
 
             mail.attachments[i].storage = this.attachment_backend.info(info, mail.attachments[i])

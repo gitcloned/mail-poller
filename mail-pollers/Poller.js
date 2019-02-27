@@ -101,7 +101,7 @@ class Poller extends EventEmitter {
 
             that.connection = connection
 
-            that.interval = setTimeout(() => {
+            that.interval = setInterval(() => {
 
                 if (that.last_run && that.last_run.isRunning()) {
                     console.log("Last run {%s} is still running", that.last_run.runId)
