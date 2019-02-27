@@ -45,9 +45,9 @@ class SFTP {
         let Client = require('ssh2-sftp-client');
         let sftp = new Client();
 
-        sftp.once('error', (err) => {
-            callback(err)
-        })
+        // sftp.once('error', (err) => {
+        //     callback(err)
+        // })
 
         var options = {
             host: config.host,
@@ -72,8 +72,10 @@ class SFTP {
                     if (object.storage === null) return callback(null)
 
                     let tempDir = [tempFolder, id].join("/")
-                    let tempFilePath = [tempDir, object.storage.filename].join("/")
+                    let tempFilePath = [tempFolder, object.storage.filename].join("/")
                     let remoteFilePath = [object.storage.folder, object.storage.filename].join("/")
+
+                    fs.writeFileSync(tempFilePath, Buffer.from(object.data.toString()), 'utf8')
 
                     console.log("\nuploading file: %s", remoteFilePath)
 

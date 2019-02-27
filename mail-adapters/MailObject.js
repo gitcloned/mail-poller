@@ -241,7 +241,7 @@ class MailObject {
 
                 if (exists) {
                     that.saved = true
-                    return callback(null, [messageId, true])
+                    // return callback(null, [messageId, true])
                 }
 
                 that.parseAttachments(connection, (err, attachments, body) => {
@@ -272,7 +272,7 @@ class MailObject {
                             })
                         }
 
-                        callback(null, [messageId, false, true])
+                        callback(null, [messageId, exists, true])
 
                         // remove mail object for GC
                         mail = null
