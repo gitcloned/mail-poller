@@ -152,6 +152,8 @@ class Mailbox extends EventEmitter {
             })
         }).catch((err) => {
 
+            console.log(err)
+
             callback({
                 at: "fetching",
                 err: err

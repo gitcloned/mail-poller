@@ -13,8 +13,10 @@ class SFTP {
 
         this.tempFolder = this.config.tempFolder || "./temp"
 
-        this.privateKey = fs.readFileSync(this.config.privateKey)
-        this.passphrase = fs.readFileSync(this.config.passphrase)
+        this.privateKey = fs.readFileSync(this.config.privateKey).toString()
+        this.passphrase = fs.readFileSync(this.config.passphrase).toString()
+
+	this.folder = this.config.folder
     }
 
     init(callback) {
@@ -29,7 +31,7 @@ class SFTP {
 
     saveBodyAndAttachments(id, mail, callback) {
 
-        // console.log("saving mail body and attachments")
+        console.log("saving mail body and attachments: %s", id)
 
         var attachments = mail.attachments
 
@@ -50,15 +52,22 @@ class SFTP {
 
             return next(null, function (callback) {
 
-                let tempFilePath = [tempFolder, id, object.filename].join("/")
-                let remoteFilePath = [object.storage.folder, object.filename].join("/")
+		let tempDir = [tempFolder, id].join("/")
+                let tempFilePath = [tempDir, object.filename].join("/")
+                let remoteFilePath = [object.storage.folder].join("/")
+
+		try {
+                    fs.mkdirSync(tempDir, { recursive: true })
+		} catch (e) {}
+
+                console.log(tempFilePath, remoteFilePath)
 
                 fs.writeFileSync(tempFilePath, object.data)
 
                 var options = {
                         host: config.host,
                         username: config.username,
-                        path: tempFilePath,
+                        path: tempDir,
                         remoteDir: remoteFilePath,
                         privateKey: privateKey,
                         passphrase: passphrase
@@ -66,6 +75,7 @@ class SFTP {
                     sftp = new SftpUpload(options);
 
                 console.log(' uploading: %s', remoteFilePath)
+		console.log(options)
 
                 sftp.on('error', function (err) {
                         cleanup(tempFilePath)
@@ -81,6 +91,7 @@ class SFTP {
                         callback(null)
                     })
                     .upload();
+
             })
         }
 

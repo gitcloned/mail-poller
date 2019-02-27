@@ -32,6 +32,7 @@ class MailBackend {
                 this.attachment_backend = new S3(clientname, config.s3)
                 break
             case "sftp":
+                console.log(' creating SFTP backend')
                 var SFTP = require('./backends/attachments/SFTP')
                 this.attachment_backend = new SFTP(clientname, config.sftp)
                 break
