@@ -261,7 +261,11 @@ class MailObject {
 
                     mail.body.data = body
 
+                    console.log("saving body and attachments")
+
                     mailBackend.saveBodyAndAttachments(mail, (err) => {
+
+                        console.log(err)
 
                         if (err) {
                             // TODO: log here

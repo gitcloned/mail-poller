@@ -5,5 +5,4 @@ var SftpUpload = require('sftp-upload'),
 module.exports.handle = function (mails) {
 
     
-
 }

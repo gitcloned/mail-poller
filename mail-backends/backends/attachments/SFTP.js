@@ -54,6 +54,8 @@ class SFTP {
         }
 
         sftp.connect(options).then(() => {
+
+            console.log("connected to SFTP")
             
             var cleanup = (filePath) => {
                 if (fs.existsSync(filePath))
@@ -95,6 +97,9 @@ class SFTP {
                     sftp.end()
     
                     if (err) {
+
+                        console.log("err while uloading to SFTP, err: %s", err)
+
                         return callback(err)
                     }
     
