@@ -75,11 +75,11 @@ class SFTP {
                     let tempFilePath = [tempFolder, object.storage.filename].join("/")
                     let remoteFilePath = [object.storage.folder, object.storage.filename].join("/")
 
-                    fs.writeFileSync(tempFilePath, Buffer.from(object.data.toString()), 'utf8')
+                    fs.writeFileSync(tempFilePath, object.data)
 
-                    console.log("\nuploading file: %s", remoteFilePath)
+                    console.log("\nuploading file %s: %s", typeof object.data, remoteFilePath)
 
-                    sftp.put(Buffer.from(object.data.toString()), remoteFilePath)
+                    sftp.put(Buffer.from(object.data), remoteFilePath)
                         .then(() => {
                             console.log(" - uploaded file: %s", remoteFilePath)
                             callback(null)
