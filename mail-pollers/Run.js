@@ -12,7 +12,7 @@ class Run {
 
         this.pollerTags = {}
 
-        for (var i=0; i<tags.length; i++) {
+        for (var i = 0; i < tags.length; i++) {
             this.pollerTags[tags[i][0]] = tags[i][1]
         }
 
@@ -98,9 +98,11 @@ class Run {
         if (errors.length)
             console.log(errors)
 
-        this.model.save((err) => {
-            console.log(err)
-        })
+        try {
+            this.model.save((err) => {
+                console.log(err)
+            })
+        } catch (e) {}
     }
 
     info() {
@@ -119,7 +121,7 @@ class Run {
         return this.pollerConfig.box
     }
 
-    tags () {
+    tags() {
         return this.pollerTags
     }
 
@@ -144,22 +146,22 @@ class Run {
         } else return [type, date]
     }
 
-    complete () {
+    complete() {
 
         this.completed = true
     }
 
-    isRunning () {
+    isRunning() {
 
         return this.completed !== true
     }
 
-    stillRunning () {
+    stillRunning() {
 
         this.heartbeat++
     }
 
-    kill () {
+    kill() {
 
     }
 }
