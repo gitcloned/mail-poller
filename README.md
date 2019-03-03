@@ -4,7 +4,7 @@ Simple project to sniff mails and take lot of action on it, like running a workf
 
 ![flow](https://github.com/gitcloned/mail-poller/raw/master/resources/images/Flow.PNG)
 
-Basic Usage:
+**Basic Usage:**
 
 ```javascript
 node poller -c <clientname> --config poller.properties
