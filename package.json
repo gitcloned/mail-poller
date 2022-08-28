@@ -23,7 +23,7 @@
     "moment": "^2.24.0",
     "mongodb-igniter": "^1.0.0",
     "mongoose": "^5.4.4",
-    "properties-reader": "0.0.16",
+    "properties-reader": "2.2.0",
     "sftp-upload": "^1.0.0",
     "ssh2-sftp-client": "^2.4.3",
     "string-template": "^1.0.0",
