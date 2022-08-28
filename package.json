@@ -20,7 +20,7 @@
     "email-addresses": "^3.0.3",
     "file-extension": "^4.0.5",
     "imap-simple": "^4.2.0",
-    "moment": "^2.24.0",
+    "moment": "^2.29.4",
     "mongodb-igniter": "^1.0.0",
     "mongoose": "^5.4.4",
     "properties-reader": "2.2.0",
